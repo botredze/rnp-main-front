@@ -1,0 +1,10 @@
+.mainPage {
+  display: flex;
+  height: 100vh;
+  background-color: #f9fafb;
+
+  .mainContent {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
