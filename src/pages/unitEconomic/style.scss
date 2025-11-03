@@ -1,0 +1,22 @@
+
+.mainPageContainer{
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+
+  .addButton{
+    margin-bottom: 10px;
+    width: 150px;
+  }
+
+  .myProduct{
+    margin-top: 20px;
+    width: 80%;
+  }
+}
+
+.flexRu{
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+}

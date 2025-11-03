@@ -1,0 +1,44 @@
+
+.container{
+
+  .mainContent {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    .wide {
+      flex: 2;
+    }
+
+    .normal {
+      flex: 1;
+    }
+  }
+
+  .secondContent{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.main-table{
+  margin-top: 20px;
+}
+
+.unit-table {
+  border-collapse: collapse !important; // обязательно
+  border: none !important;
+
+  th,
+  td {
+    border: none !important;
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+};
+

@@ -17,6 +17,12 @@ const SideBar = () => {
                     РНП Аналитика
                 </NavLink>
                 <NavLink
+                    to="/unitEconomic"
+                    className={({ isActive }) => isActive ? 'activeLink' : ''}
+                >
+                    Юнит экономика
+                </NavLink>
+                <NavLink
                     to="/about"
                     className={({ isActive }) => isActive ? 'activeLink' : ''}
                 >

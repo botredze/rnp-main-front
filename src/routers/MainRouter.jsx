@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import MainPage from "../pages/mainPage/MainPage.jsx";
 import MainLayouts from "../components/layouts/MainLayouts.jsx";
 import LoginPage from "../pages/loginPage/LoginPage.jsx";
+import UnitEconomicPage from "../pages/unitEconomic/UnitEconomicPage.jsx";
 
 const MainRouter = () => {
     return (
@@ -11,6 +12,7 @@ const MainRouter = () => {
                 <Route element={<MainLayouts />}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/unitEconomic" element={<UnitEconomicPage />}/>
                 </Route>
             </Routes>
         </>
