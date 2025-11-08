@@ -9,6 +9,7 @@ import {
     setSelectedOrganization,
 } from '../../store/reducers/organizationSlice.js';
 import { logout } from '../../store/reducers/authSlice.js';
+import { getOrganizationProductLis } from '../../store/reducers/productsSlice.js';
 
 const SideBar = () => {
     const [selectedIP, setSelectedIP] = useState(null);
@@ -23,7 +24,7 @@ const SideBar = () => {
             setSelectedIP(String(organizationList[0].id));
             dispatch(setSelectedOrganization(organizationList[0]));
         }
-    }, [organizationList, organization, dispatch]);
+    }, [organizationList, organization]);
 
     const handleSelectChange = (value) => {
         setSelectedIP(value);
