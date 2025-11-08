@@ -20,3 +20,11 @@
   flex-direction: row;
   gap: 3px;
 }
+
+.myTable tr:nth-of-type(odd) {
+  background-color: #ffffff; // цвет для нечётных строк
+}
+
+.myTable tr:nth-of-type(even) {
+  background-color: #f5f5f5; // цвет для чётных строк
+}

@@ -4,13 +4,19 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(135deg, #2b8aef, #1b6edb);
+  background: linear-gradient(135deg, #868686, #e3e2e2);
   font-family: 'Inter', sans-serif;
+  flex-direction: column;
+
+  .logo {
+    width: 450px;
+    margin-bottom: 30px;
+  }
 }
 
 .loginContainer {
   background: #fff;
-  padding: 2rem 2.5rem;
+  padding: 3rem 2.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   width: 100%;

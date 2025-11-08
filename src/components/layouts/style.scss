@@ -8,3 +8,26 @@
     overflow-y: auto;
   }
 }
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 60px 10px;
+
+  .sidebarNav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebarFooter {
+    margin-top: auto;
+  }
+
+  .activeLink {
+    font-weight: bold;
+    color: #1a73e8;
+  }
+}

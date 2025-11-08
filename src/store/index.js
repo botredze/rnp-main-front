@@ -11,28 +11,31 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import unitEconomicSlice from './reducers/unitEconomicSlice';
+import organizationSlice from './reducers/organizationSlice';
+import authSlice from './reducers/authSlice';
 
-const reducer = combineReducers({
+const rootReducer = combineReducers({
+    auth: authSlice,
     unitEconomic: unitEconomicSlice,
+    organization: organizationSlice,
 });
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['saveDataSlice'],
+    whitelist: ['auth'],
 };
 
-const persistedReducer = persistReducer(persistConfig, reducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = configureStore({
+export const store = configureStore({
     reducer: persistedReducer,
-    // middleware: (getDefaultMiddleware) =>
-    //     getDefaultMiddleware({
-    //         serializableCheck: {
-    //             ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    //         },
-    //     }),
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }),
 });
 
 export const persistor = persistStore(store);
-export { store };

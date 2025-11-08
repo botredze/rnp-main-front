@@ -26,12 +26,18 @@
     flex-direction: column;
     gap: 1rem;
 
-    a {
+    a,
+    button {
       color: black;
+      background: transparent;
+      border: none;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
       text-decoration: none;
       padding: 0.6rem 1rem;
       border-radius: 7px;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, font-weight 0.2s ease;
 
       &:hover {
         background: rgba(255, 255, 255, 0.2);
