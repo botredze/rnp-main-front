@@ -1,6 +1,25 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
+import './style.scss';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const RnpMain = () => {
+    const [showStats, setShowStats] = useState(false);
+    const { rnpStatistic } = useSelector((state) => state.products);
+
+    const [salesList, setSales] = useState([]);
+    const [ordersList, setOrders] = useState([]);
+    const [reklamaL, setReklama] = useState([]);
+    const [statistic, setStatistic] = useState([]);
+
     const tables = [
         {
             title: 'Статистика заказов',
@@ -38,6 +57,20 @@ const RnpMain = () => {
         },
     ];
 
+    useEffect(() => {
+        if (typeof rnpStatistic === 'object') {
+            setShowStats(false);
+
+            const { sales, orders, stats, advestStats } = rnpStatistic;
+
+            setSales(sales);
+            setOrders(orders);
+            setStatistic(stats);
+            setReklama(advestStats);
+        }
+    }, [rnpStatistic]);
+
+    console.log(rnpStatistic, 'rnpStatistic');
     return (
         <Paper
             sx={{
@@ -57,6 +90,8 @@ const RnpMain = () => {
                                 <TableCell align="center" colSpan={2} sx={{ fontWeight: 'bold' }}>
                                     {table.title}
                                 </TableCell>
+
+                                {}
                             </TableRow>
                         </TableHead>
                         <TableBody>

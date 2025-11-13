@@ -24,7 +24,7 @@ const SideBar = () => {
             setSelectedIP(String(organizationList[0].id));
             dispatch(setSelectedOrganization(organizationList[0]));
         }
-    }, [organizationList, organization]);
+    }, [organization]);
 
     const handleSelectChange = (value) => {
         setSelectedIP(value);

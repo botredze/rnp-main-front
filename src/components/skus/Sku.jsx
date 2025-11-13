@@ -7,7 +7,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrganizationProductLis } from '../../store/reducers/productsSlice.js';
+import {
+    getOrganizationProductLis,
+    getProductRnpStatistic,
+    setSelectedProduct,
+} from '../../store/reducers/productsSlice.js';
 import { Select, Title, Text, Card, Group } from '@mantine/core';
 
 const Skus = () => {
@@ -28,6 +32,11 @@ const Skus = () => {
         console.log(value, 'value');
         const foundSku = productList.find((item) => String(item.id) === String(value));
         setSelectedSku(foundSku);
+
+        if (!!value) {
+            //dispatch(getProductRnpStatistic({ productId: selectedSku }));
+            dispatch(setSelectedProduct(foundSku));
+        }
     };
 
     return (

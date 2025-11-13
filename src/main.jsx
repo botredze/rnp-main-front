@@ -21,7 +21,7 @@ function Root() {
         <StrictMode>
             <BrowserRouter>
                 <Provider store={store}>
-                    <MantineProvider theme={theme}>
+                    <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
                         <Notifications position="top-right" />
                         <App />
                     </MantineProvider>

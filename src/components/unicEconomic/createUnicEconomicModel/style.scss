@@ -1,19 +1,15 @@
 
 .container{
 
-  .mainContent {
+  .mainDataContent {
+    width: 100%;
     margin-top: 20px;
     display: flex;
     flex-direction: row;
     gap: 10px;
+    align-items: center;
+    justify-content: center;
 
-    .wide {
-      flex: 2;
-    }
-
-    .normal {
-      flex: 1;
-    }
   }
 
   .secondContent{
@@ -69,6 +65,17 @@ span {
 
   span {
     color: #7c9cff;
-    font-weight: 500;
+    font-weight: 600;
   }
+
+  td {
+    color: #7c9cff;
+    font-weight: 600;
+  }
+}
+
+
+.seconder-item{
+  color: rgba(157, 157, 157, 0.89);
+  padding-left: 10px;
 }
