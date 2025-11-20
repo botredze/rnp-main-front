@@ -7,103 +7,118 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
-import './style.scss';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { DateTime } from 'luxon';
 
 const RnpMain = () => {
     const [showStats, setShowStats] = useState(false);
     const { rnpStatistic } = useSelector((state) => state.products);
-
-    const [salesList, setSales] = useState([]);
-    const [ordersList, setOrders] = useState([]);
-    const [reklamaL, setReklama] = useState([]);
     const [statistic, setStatistic] = useState([]);
 
     const tables = [
         {
             title: 'Статистика заказов',
             rows: [
-                'Заказы',
-                'Продажи',
-                'Общий процент выкупа',
-                'Оборачиваемость дней',
-                'Остаток кончится',
+                { label: 'Заказы', key: 'orders_count' },
+                { label: 'Продажи', key: 'sales_total_amount' },
+                { label: 'Общий процент выкупа', key: 'avg_buy_out_percent' },
+                { label: 'Оборачиваемость дней', key: 'turnover_days' },
+                { label: 'Остаток кончится', key: 'stock_total' },
             ],
         },
         {
+            title: 'Остатки',
+            rows: [{ label: 'Остаток на складах', key: 'stock_count' }],
+        },
+
+        {
             title: 'Конверсии',
             rows: [
-                'Процент выкупа',
-                'Переходы',
-                'Добавили в корзину',
-                'Процент добавления в корзину',
-                'Добавили в заказ',
-                'Процент добавления в заказ',
+                { label: 'Процент выкупа', key: 'avg_buy_out_percent' },
+                { label: 'Переходы', key: 'open_card_count' },
+                { label: 'Добавили в корзину', key: 'add_to_card_count' },
+                { label: 'Процент добавления в корзину', key: 'avg_add_to_card_conversion' },
+                { label: 'Добавили в заказ', key: 'history_orders_count' },
+                { label: 'Процент добавления в заказ', key: 'avg_card_to_order_conversion' },
             ],
         },
         {
             title: 'Реклама',
             rows: [
-                'Затраты',
-                'Просмотров',
-                'Кликов',
-                'CPC',
-                'CTR',
-                'Добавили в корзину с рекламы',
-                'Заказов с рекламы',
-                'CPO',
+                { label: 'Затраты', key: 'adv_spend' },
+                { label: 'Просмотров', key: 'adv_views' },
+                { label: 'Кликов', key: 'adv_clicks' },
+                { label: 'CPC', key: 'cpc' },
+                { label: 'CTR', key: 'ctr' },
+                { label: 'Добавили в корзину с рекламы', key: 'adv_atbs' },
+                { label: 'Заказов с рекламы', key: 'adv_orders' },
+                { label: 'CPO', key: 'cpo' },
             ],
         },
     ];
 
     useEffect(() => {
-        if (typeof rnpStatistic === 'object') {
-            setShowStats(false);
-
-            const { sales, orders, stats, advestStats } = rnpStatistic;
-
-            setSales(sales);
-            setOrders(orders);
-            setStatistic(stats);
-            setReklama(advestStats);
+        if (rnpStatistic.length > 0) {
+            setShowStats(true);
+            setStatistic(rnpStatistic);
         }
     }, [rnpStatistic]);
 
-    console.log(rnpStatistic, 'rnpStatistic');
+    console.log(showStats, 'showStats');
+
+    const allRows = tables.flatMap((table) => table.rows);
+
     return (
         <Paper
             sx={{
-                width: 'max-content',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                gap: 2,
+                width: '100%',
+                overflowX: 'auto',
             }}
         >
-            {tables.map((table, index) => (
-                <TableContainer key={index} sx={{ height: '100%' }}>
-                    <Table stickyHeader aria-label={`table-${index}`}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center" colSpan={2} sx={{ fontWeight: 'bold' }}>
-                                    {table.title}
-                                </TableCell>
-
-                                {}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {table.rows.map((row, i) => (
-                                <TableRow key={i}>
-                                    <TableCell>{row}</TableCell>
+            <TableContainer sx={{ minWidth: 1200 }}>
+                <Table stickyHeader>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Дата</TableCell>
+                            {showStats &&
+                                statistic.map((data, i) => (
+                                    <TableCell key={i} align="center">
+                                        {DateTime.fromISO(data.date).toFormat('dd.MM.yyyy')}
+                                    </TableCell>
+                                ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tables.map((table, tIndex) => (
+                            <Fragment key={tIndex}>
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={showStats ? statistic.length + 1 : 1}
+                                        sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}
+                                    >
+                                        {table.title}
+                                    </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            ))}
+
+                                {table.rows.map((row) => (
+                                    <TableRow key={row.key}>
+                                        <TableCell sx={{ fontWeight: 'bold', width: 250 }}>
+                                            {row.label}
+                                        </TableCell>
+                                        {showStats &&
+                                            statistic.map((data, i) => (
+                                                <TableCell key={i} align="center">
+                                                    {data[row.key] ?? 0}
+                                                </TableCell>
+                                            ))}
+                                    </TableRow>
+                                ))}
+                            </Fragment>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Paper>
     );
 };
