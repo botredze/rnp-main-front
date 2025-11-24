@@ -1,6 +1,5 @@
 import './style.scss';
 import { useEffect, useState } from 'react';
-import { skus } from '../../hylpers/skus.js';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -9,7 +8,6 @@ import 'swiper/css/pagination';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     getOrganizationProductLis,
-    getProductRnpStatistic,
     setSelectedProduct,
 } from '../../store/reducers/productsSlice.js';
 import { Select, Title, Text, Card, Group } from '@mantine/core';

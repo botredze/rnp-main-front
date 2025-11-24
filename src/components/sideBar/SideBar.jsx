@@ -65,12 +65,16 @@ const SideBar = () => {
                 >
                     Настройки
                 </NavLink>
-                <NavLink
-                    to="/settings"
-                    className={({ isActive }) => (isActive ? 'activeLink' : '')}
-                >
-                    Мой профиль
+
+                <NavLink to="/admin" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
+                    Админка
                 </NavLink>
+                {/*<NavLink*/}
+                {/*    to="/settings"*/}
+                {/*    className={({ isActive }) => (isActive ? 'activeLink' : '')}*/}
+                {/*>*/}
+                {/*    Мой профиль*/}
+                {/*</NavLink>*/}
 
                 <button className="logoutButton" onClick={handleLogout}>
                     Выйти

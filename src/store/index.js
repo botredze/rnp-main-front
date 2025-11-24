@@ -14,12 +14,14 @@ import unitEconomicSlice from './reducers/unitEconomicSlice';
 import organizationSlice from './reducers/organizationSlice';
 import authSlice from './reducers/authSlice';
 import productsSlice from './reducers/productsSlice.js';
+import usersSlice from './reducers/usersSlice.js';
 
 const rootReducer = combineReducers({
     auth: authSlice,
     unitEconomic: unitEconomicSlice,
     organization: organizationSlice,
     products: productsSlice,
+    users: usersSlice,
 });
 
 const persistConfig = {

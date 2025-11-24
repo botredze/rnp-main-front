@@ -9,6 +9,7 @@ const initialState = {
     loading: false,
     error: null,
     organizationList: [{ id: 0, organizationName: '' }],
+    organizationListById: [],
 };
 
 export const getOrganizationList = createAsyncThunk(
@@ -16,6 +17,31 @@ export const getOrganizationList = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(`/organization/list`);
+
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const getOrganizationListByUserId = createAsyncThunk(
+    'organization/getOrganizationListById',
+    async (query, { rejectWithValue }) => {
+        const params = new URLSearchParams();
+
+        console.log(query, 'query');
+        const { userId } = query;
+        console.log(userId, 'userId');
+
+        if (userId) {
+            params.append('userId', userId);
+        }
+
+        try {
+            const response = await axiosInstance.get(`/organization/list`, { params });
 
             if (response.status === 200) {
                 return response.data;
@@ -36,6 +62,7 @@ const organizationSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            //organizationList
             .addCase(getOrganizationList.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -45,6 +72,19 @@ const organizationSlice = createSlice({
                 state.organizationList = action.payload;
             })
             .addCase(getOrganizationList.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            //organizationListById
+            .addCase(getOrganizationListByUserId.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
+                state.loading = false;
+                state.organizationListById = action.payload;
+            })
+            .addCase(getOrganizationListByUserId.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

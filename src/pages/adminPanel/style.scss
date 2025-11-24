@@ -1,0 +1,79 @@
+.adminPanelPage{
+  padding: 10px;
+
+  .users{
+    padding: 5px 13px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    .user_title{
+      font-size: 22px;
+      font-weight: 600;
+
+    }
+    .userFilters{
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+
+      .rolesSelector{
+        width: 250px;
+      }
+      .statusesSelector{
+        width: 250px;
+
+      }
+    }
+
+  }
+
+  .usersList{
+    padding: 30px 20px 0 20px;
+
+
+    .user-table-head {
+      background: #f7f8fa;
+      font-size: 14px;
+      font-weight: 600;
+
+      .user-table-row--head {
+        border-bottom: 2px solid #e0e0e0;
+
+        .user-table-col {
+          font-size: 14px;
+          font-weight: 600;
+          color: #333;
+          padding: 12px 10px;
+
+          &--index {
+            text-align: center;
+          }
+
+          &--actions {
+            text-align: center;
+            width: 200px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.user-table-row {
+  font-size: 15px;
+  font-weight: 500;
+
+  &:hover {
+    font-weight: 600;
+  }
+}
+.actionButtons{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
