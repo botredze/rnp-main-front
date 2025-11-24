@@ -22,7 +22,6 @@ export const getOrganizationProductLis = createAsyncThunk(
                 `/rnp-statistic/list?organizationId=${organizationId}`
             );
 
-            console.log(response.data);
             if (response.status === 200) {
                 return response.data;
             }
@@ -35,7 +34,6 @@ export const getOrganizationProductLis = createAsyncThunk(
 export const getProductRnpStatistic = createAsyncThunk(
     'products/getProductRnpStatistic',
     async (props, { rejectWithValue }) => {
-        console.log(props, 'props');
         const { productId, timePeriod, startDate, endDate } = props;
 
         const params = new URLSearchParams();

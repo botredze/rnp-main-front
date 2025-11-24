@@ -53,10 +53,7 @@ const MainPage = () => {
     };
 
     useEffect(() => {
-        console.log(selectedTimePeriod, 'selectedTimePeriod');
-
         if (selectedProduct) {
-            console.log(selectedProduct, 'selectedProduct');
             dispatch(
                 getProductRnpStatistic({
                     productId: selectedProduct.id,

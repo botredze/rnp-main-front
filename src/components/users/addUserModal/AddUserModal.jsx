@@ -1,20 +1,30 @@
-import { useState } from 'react';
-import { Modal, TextInput, PasswordInput, Select, Button, Group } from '@mantine/core';
+import { useState, useEffect } from 'react';
+import { Drawer, TextInput, PasswordInput, Select, Button, Group } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createUser,
     getUsersList,
     setAddUserState,
+    setSelectedUser,
     setError,
+    updateUserById,
+    setEditOrganizationModal,
 } from '../../../store/reducers/usersSlice.js';
 import { userRoles } from '../../helpers/usersMap.js';
 
 const AddUserModal = () => {
-    const { addUserState, error, filterParams } = useSelector((state) => state.users);
+    const { addUserState, editOrganizationModal, selectedUser, filterParams } = useSelector(
+        (state) => state.users
+    );
+
     const dispatch = useDispatch();
+
+    const isEdit = Boolean(selectedUser);
 
     const close = () => {
         dispatch(setAddUserState(false));
+        dispatch(setEditOrganizationModal(false));
+        dispatch(setSelectedUser(null));
     };
 
     const [fullName, setFullName] = useState('');
@@ -24,11 +34,25 @@ const AddUserModal = () => {
 
     const [errors, setErrors] = useState({});
 
+    useEffect(() => {
+        if (selectedUser) {
+            setFullName(selectedUser.fio || '');
+            setLogin(selectedUser.login || '');
+            setPassword('');
+            setRole(selectedUser.role || '');
+        } else {
+            setFullName('');
+            setLogin('');
+            setPassword('');
+            setRole('');
+        }
+    }, [selectedUser]);
+
     const validate = () => {
         const newErrors = {};
         if (!fullName.trim()) newErrors.fullName = 'ФИО обязательно';
         if (!login.trim()) newErrors.login = 'Логин обязателен';
-        if (!password.trim()) newErrors.password = 'Пароль обязателен';
+        if (!isEdit && !password.trim()) newErrors.password = 'Пароль обязателен';
         if (!role) newErrors.role = 'Роль обязательна';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -37,32 +61,54 @@ const AddUserModal = () => {
     const handleSubmit = async () => {
         if (!validate()) return;
 
-        const newUser = { fio: fullName, login, password, role };
+        const userData = {
+            fio: fullName,
+            login,
+            role,
+        };
+
+        if (!isEdit) {
+            userData.password = password; // при создании обязателен
+        } else {
+            if (password.trim()) {
+                userData.password = password; // при редактировании только если изменили
+            }
+        }
 
         try {
-            const resultAction = await dispatch(createUser(newUser));
+            let resultAction;
 
-            if (createUser.fulfilled.match(resultAction)) {
-                console.log('Пользователь создан');
+            if (isEdit) {
+                resultAction = await dispatch(
+                    updateUserById({ id: selectedUser.id, data: userData })
+                );
+            } else {
+                resultAction = await dispatch(createUser(userData));
+            }
 
+            if (resultAction.meta.requestStatus === 'fulfilled') {
                 const params = {};
                 if (filterParams.role) params.role = filterParams.role;
                 if (filterParams.status) params.status = filterParams.status;
 
                 await dispatch(getUsersList(params));
                 dispatch(setError(false));
-
                 close();
-            } else {
-                console.error('Ошибка при создании пользователя', resultAction.error);
             }
         } catch (err) {
-            console.error('Ошибка запроса:', err);
+            console.error('Ошибка:', err);
         }
     };
 
     return (
-        <Modal opened={addUserState} onClose={close} title="Добавление пользователя">
+        <Drawer
+            opened={addUserState || editOrganizationModal}
+            onClose={close}
+            title={isEdit ? 'Редактирование пользователя' : 'Добавление пользователя'}
+            padding="md"
+            size="35%"
+            position="right"
+        >
             <TextInput
                 label="ФИО"
                 placeholder="Введите ФИО"
@@ -81,12 +127,13 @@ const AddUserModal = () => {
             />
             <PasswordInput
                 label="Пароль"
-                placeholder="Введите пароль"
+                placeholder={isEdit ? 'Оставьте пустым, если не хотите менять' : 'Введите пароль'}
                 value={password}
                 onChange={(e) => setPassword(e.currentTarget.value)}
                 error={errors.password}
                 mb="sm"
             />
+
             <Select
                 label="Роль"
                 placeholder="Выберите роль"
@@ -96,16 +143,17 @@ const AddUserModal = () => {
                 error={errors.role}
                 mb="sm"
             />
+
             <Group justify="center" mt="md">
                 <Button variant="light" color="green" size="md" radius="md" onClick={handleSubmit}>
-                    Сохранить
+                    {isEdit ? 'Сохранить изменения' : 'Сохранить'}
                 </Button>
 
                 <Button variant="light" color="red" size="md" radius="md" onClick={close}>
                     Отмена
                 </Button>
             </Group>
-        </Modal>
+        </Drawer>
     );
 };
 

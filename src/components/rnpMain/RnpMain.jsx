@@ -65,8 +65,6 @@ const RnpMain = () => {
         }
     }, [rnpStatistic]);
 
-    console.log(showStats, 'showStats');
-
     const allRows = tables.flatMap((table) => table.rows);
 
     return (

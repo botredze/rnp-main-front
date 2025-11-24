@@ -15,7 +15,6 @@ export const getUsersList = createAsyncThunk('users/get', async (filters, { reje
     try {
         const response = await axiosInstance.get(`${API_URL}/users/list`, { params });
 
-        console.log(response.data, 'response.data');
         if (response.status === 200) {
             return response.data;
         }
@@ -73,7 +72,6 @@ export const createUser = createAsyncThunk('users/create', async (body, { reject
     try {
         const response = await axiosInstance.post(`${API_URL}/users/create`, body);
 
-        console.log(response.status, response.data);
         if (response.status === 201) {
             return response.data;
         }
@@ -92,6 +90,7 @@ const userSlice = createSlice({
         addUserState: false,
         filterParams: {},
         viewOrganizationModal: false,
+        editOrganizationModal: false,
     },
     reducers: {
         setAddUserState: (state, action) => {
@@ -111,6 +110,9 @@ const userSlice = createSlice({
 
         setSelectedUser: (state, action) => {
             state.selectedUser = action.payload;
+        },
+        setEditOrganizationModal: (state, action) => {
+            state.editOrganizationModal = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -146,6 +148,12 @@ const userSlice = createSlice({
     },
 });
 
-export const { setAddUserState, setFilters, setError, setSelectedUser, setViewOrganizationModal } =
-    userSlice.actions;
+export const {
+    setAddUserState,
+    setFilters,
+    setError,
+    setEditOrganizationModal,
+    setSelectedUser,
+    setViewOrganizationModal,
+} = userSlice.actions;
 export default userSlice.reducer;

@@ -16,7 +16,6 @@ const LoginPage = () => {
         e.preventDefault();
         const result = await dispatch(loginUser({ login, password }));
 
-        console.log(result, 'result');
         if (result.meta.requestStatus === 'fulfilled') {
             navigate('/');
         }

@@ -10,6 +10,8 @@ const initialState = {
     error: null,
     organizationList: [{ id: 0, organizationName: '' }],
     organizationListById: [],
+    openCreateOrganizationState: false,
+    editOrganizationOpenState: false,
 };
 
 export const getOrganizationList = createAsyncThunk(
@@ -32,9 +34,7 @@ export const getOrganizationListByUserId = createAsyncThunk(
     async (query, { rejectWithValue }) => {
         const params = new URLSearchParams();
 
-        console.log(query, 'query');
         const { userId } = query;
-        console.log(userId, 'userId');
 
         if (userId) {
             params.append('userId', userId);
@@ -52,12 +52,46 @@ export const getOrganizationListByUserId = createAsyncThunk(
     }
 );
 
+export const updateOrganizationById = createAsyncThunk(
+    'organization/updateOrganizationById',
+    async (organization, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.put(
+                `/organization/update/${organization.id}`,
+                organization
+            );
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const createOrganization = createAsyncThunk(
+    'organization/createOrganization',
+    async (organization, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.put(
+                `/organization/update/${organization.id}`,
+                organization
+            );
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
 const organizationSlice = createSlice({
     name: 'organization',
     initialState,
     reducers: {
         setSelectedOrganization: (state, action) => {
             state.organization = action.payload;
+        },
+        setOpenCreateOrganizationState: (state, action) => {
+            state.openCreateOrganizationState = action.payload;
+        },
+        setEditOrganizationOpenState: (state, action) => {
+            state.editOrganizationOpenState = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -91,5 +125,9 @@ const organizationSlice = createSlice({
     },
 });
 
-export const { setSelectedOrganization } = organizationSlice.actions;
+export const {
+    setSelectedOrganization,
+    setOpenCreateOrganizationState,
+    setEditOrganizationOpenState,
+} = organizationSlice.actions;
 export default organizationSlice.reducer;

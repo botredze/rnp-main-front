@@ -27,7 +27,6 @@ const Skus = () => {
     }, [organization]);
 
     const handleSelect = (value) => {
-        console.log(value, 'value');
         const foundSku = productList.find((item) => String(item.id) === String(value));
         setSelectedSku(foundSku);
 

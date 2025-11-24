@@ -11,19 +11,28 @@ import {
 import {
     getUsersList,
     setAddUserState,
+    setEditOrganizationModal,
     setFilters,
     setSelectedUser,
     setViewOrganizationModal,
 } from '../../store/reducers/usersSlice.js';
-import AddUserModal from '../../components/users/addUserModal/AddUserModal.jsx';
 import { IconEdit, IconTrash, IconBan } from '@tabler/icons-react';
 import { getOrganizationListByUserId } from '../../store/reducers/organizationSlice.js';
 import ViewOrganizationList from '../../components/users/viewOrganizationList/ViewOrganizationList.jsx';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import ConfirmAlert from '../../components/configAlert/confirmAlert.jsx';
+import AddUserModal from '../../components/users/addUserModal/AddUserModal.jsx';
 
 const AdminPanel = () => {
     const [selectedStatus, setSelectedStatus] = useState(null);
     const [selectedRole, setSelectedRole] = useState(null);
     const dispatch = useDispatch();
+    //delete
+    const [selectedUser, setSelectedUserItem] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+    // dicative
+    const [dicativeModalOpen, setDicativeModalOpen] = useState(false);
 
     useEffect(() => {
         const params = {};
@@ -47,13 +56,44 @@ const AdminPanel = () => {
     };
 
     const openUserOrganizations = (data) => {
-        console.log(data, 'data');
         dispatch(setViewOrganizationModal(true));
         dispatch(setSelectedUser(data));
 
         if (data.id !== 0) {
             dispatch(getOrganizationListByUserId({ userId: data.id }));
         }
+    };
+
+    const openConfirmDelete = (data) => {
+        setSelectedUserItem(data);
+        setDeleteModalOpen(true);
+    };
+
+    const closeConfirmDelete = () => {
+        setDeleteModalOpen(false);
+        setSelectedUserItem(null);
+    };
+
+    const deleteUser = () => {
+        dispatch();
+        closeConfirmDelete();
+    };
+
+    const openDiactiveModalConfirm = (data) => {
+        setSelectedUserItem(data);
+        setDicativeModalOpen(true);
+    };
+
+    const closeDiactiveModalConfirm = () => {
+        setDicativeModalOpen(false);
+        setSelectedUserItem(null);
+    };
+
+    const dicativeUser = () => {};
+
+    const editUserDrawer = (data) => {
+        dispatch(setEditOrganizationModal(true));
+        dispatch(setSelectedUser(data));
     };
 
     const rows = usersList.map((user, index) => (
@@ -80,7 +120,8 @@ const AdminPanel = () => {
                         variant="light"
                         color="blue"
                         radius="md"
-                        leftIcon={<IconEdit size={16} />}
+                        leftSection={<IconEdit size={16} />}
+                        onClick={() => editUserDrawer(user)}
                     >
                         Редактировать
                     </Button>
@@ -89,7 +130,8 @@ const AdminPanel = () => {
                         variant="light"
                         color="orange"
                         radius="md"
-                        leftIcon={<IconBan size={16} />}
+                        leftSection={<IconBan size={16} />}
+                        onClick={() => openDiactiveModalConfirm(user)}
                     >
                         Деактивировать
                     </Button>
@@ -102,7 +144,8 @@ const AdminPanel = () => {
                             borderColor: '#D91616',
                             '&:hover': { backgroundColor: '#ffe5e5' },
                         }}
-                        leftIcon={<IconTrash size={16} />}
+                        leftSection={<IconTrash size={16} />}
+                        onClick={() => openConfirmDelete(user)}
                     >
                         Удалить
                     </Button>
@@ -143,7 +186,14 @@ const AdminPanel = () => {
                 </div>
 
                 <div className="addButton">
-                    <Button variant="light" size="lg" radius="md" onClick={openAddUserModal}>
+                    <Button
+                        variant="light"
+                        size="lg"
+                        radius="md"
+                        color="green"
+                        onClick={openAddUserModal}
+                        leftSection={<AddBoxIcon size={16} />}
+                    >
                         Добавить пользователя
                     </Button>
                 </div>
@@ -205,6 +255,21 @@ const AdminPanel = () => {
 
             <AddUserModal />
             <ViewOrganizationList />
+            <ConfirmAlert
+                openState={deleteModalOpen}
+                onClose={closeConfirmDelete}
+                onConfirm={deleteUser}
+                title="Удаление"
+                message={`Вы действительно хотите удалить пользователя ${selectedUser?.fio}`}
+            />
+
+            <ConfirmAlert
+                openState={dicativeModalOpen}
+                onClose={closeDiactiveModalConfirm}
+                onConfirm={dicativeUser}
+                title="Деактивация"
+                message={`Вы действительно хотите деактивировать пользователя ${selectedUser?.fio}`}
+            />
         </div>
     );
 };

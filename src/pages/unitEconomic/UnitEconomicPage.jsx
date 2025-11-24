@@ -83,6 +83,7 @@ const UnitEconomicPage = () => {
                                     </Table.Td>
                                     <Table.Td>{item.priceWithSpp}</Table.Td>
                                     <Table.Td>{item.salePrice}</Table.Td>
+                                    БЮ
                                 </Table.Tr>
                             ))
                         ) : (
