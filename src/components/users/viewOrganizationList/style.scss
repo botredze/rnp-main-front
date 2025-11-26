@@ -1,0 +1,13 @@
+
+.createOrganization{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 5px;
+  align-items: center;
+
+  h3{
+    font-size: 18px;
+    font-weight: 600;
+  }
+}

@@ -6,7 +6,7 @@ import {
     getOrganizationList,
     setEditOrganizationOpenState,
     setOpenCreateOrganizationState,
-    setSelectedOrganization,
+    setSelectedEditOrganization,
 } from '../../store/reducers/organizationSlice.js';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { statusMapper } from '../../helpers/mapper.js';
@@ -21,6 +21,7 @@ const SettingsPage = () => {
     }, [dispatch]);
 
     const openCreateDrawer = () => {
+        dispatch(setSelectedEditOrganization(null));
         dispatch(setOpenCreateOrganizationState(true));
     };
 
@@ -28,7 +29,7 @@ const SettingsPage = () => {
 
     const openEditDrawer = (data) => {
         dispatch(setEditOrganizationOpenState(true));
-        dispatch(setSelectedOrganization(data));
+        dispatch(setSelectedEditOrganization(data));
     };
 
     return (

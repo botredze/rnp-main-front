@@ -22,6 +22,7 @@ import ViewOrganizationList from '../../components/users/viewOrganizationList/Vi
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ConfirmAlert from '../../components/configAlert/confirmAlert.jsx';
 import AddUserModal from '../../components/users/addUserModal/AddUserModal.jsx';
+import AddOrganizationDrawer from '../../components/addOrganizationDrawer/AddOrganizationDrawer.jsx';
 
 const AdminPanel = () => {
     const [selectedStatus, setSelectedStatus] = useState(null);
@@ -33,6 +34,8 @@ const AdminPanel = () => {
 
     // dicative
     const [dicativeModalOpen, setDicativeModalOpen] = useState(false);
+    const [dicativeOrg, setDiactiveOrg] = useState(false);
+    const [selectedOrganization, setSelectedOrganization] = useState(null);
 
     useEffect(() => {
         const params = {};
@@ -46,6 +49,7 @@ const AdminPanel = () => {
     const { usersList } = useSelector((state) => state.users);
 
     const openAddUserModal = () => {
+        dispatch(setSelectedUser(null));
         dispatch(setAddUserState(true));
         dispatch(
             setFilters({
@@ -95,6 +99,19 @@ const AdminPanel = () => {
         dispatch(setEditOrganizationModal(true));
         dispatch(setSelectedUser(data));
     };
+
+    const openDiactiveOrganization = (data) => {
+        console.log(data, 'data');
+        setDiactiveOrg(true);
+        setSelectedOrganization(data);
+    };
+
+    const closeDiactiveOrganization = () => {
+        setDiactiveOrg(false);
+        setSelectedOrganization(null);
+    };
+
+    const confirmDiactiveOrganization = () => {};
 
     const rows = usersList.map((user, index) => (
         <Table.Tr key={user.id}>
@@ -254,7 +271,9 @@ const AdminPanel = () => {
             </div>
 
             <AddUserModal />
-            <ViewOrganizationList />
+            <ViewOrganizationList openEditModal={openDiactiveOrganization} />
+
+            <AddOrganizationDrawer />
             <ConfirmAlert
                 openState={deleteModalOpen}
                 onClose={closeConfirmDelete}
@@ -269,6 +288,14 @@ const AdminPanel = () => {
                 onConfirm={dicativeUser}
                 title="Деактивация"
                 message={`Вы действительно хотите деактивировать пользователя ${selectedUser?.fio}`}
+            />
+
+            <ConfirmAlert
+                openState={dicativeOrg}
+                onClose={closeDiactiveOrganization}
+                onConfirm={confirmDiactiveOrganization}
+                title="Деактивация"
+                message={`Вы действительно хотите деактивировать профиль ${selectedOrganization?.organizationName}`}
             />
         </div>
     );

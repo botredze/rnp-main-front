@@ -68,10 +68,10 @@ const AddUserModal = () => {
         };
 
         if (!isEdit) {
-            userData.password = password; // при создании обязателен
+            userData.password = password;
         } else {
             if (password.trim()) {
-                userData.password = password; // при редактировании только если изменили
+                userData.password = password;
             }
         }
 
@@ -80,7 +80,13 @@ const AddUserModal = () => {
 
             if (isEdit) {
                 resultAction = await dispatch(
-                    updateUserById({ id: selectedUser.id, data: userData })
+                    updateUserById({
+                        id: selectedUser.id,
+                        login: userData.login,
+                        password: userData.password,
+                        fio: userData.fio,
+                        role: userData.role,
+                    })
                 );
             } else {
                 resultAction = await dispatch(createUser(userData));

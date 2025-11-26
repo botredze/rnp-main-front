@@ -6,6 +6,7 @@ const initialState = {
         id: 0,
         organizationName: '',
     },
+    selectedOrganization: {},
     loading: false,
     error: null,
     organizationList: [{ id: 0, organizationName: '' }],
@@ -56,10 +57,11 @@ export const updateOrganizationById = createAsyncThunk(
     'organization/updateOrganizationById',
     async (organization, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put(
-                `/organization/update/${organization.id}`,
-                organization
-            );
+            const response = await axiosInstance.post(`/organization/update`, organization);
+
+            if (response.status === 200) {
+                return response.data;
+            }
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
@@ -70,10 +72,11 @@ export const createOrganization = createAsyncThunk(
     'organization/createOrganization',
     async (organization, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put(
-                `/organization/update/${organization.id}`,
-                organization
-            );
+            const response = await axiosInstance.post(`/organization/create`, organization);
+
+            if (response.status === 200) {
+                return response.data;
+            }
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
@@ -92,6 +95,9 @@ const organizationSlice = createSlice({
         },
         setEditOrganizationOpenState: (state, action) => {
             state.editOrganizationOpenState = action.payload;
+        },
+        setSelectedEditOrganization: (state, action) => {
+            state.selectedOrganization = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -122,6 +128,47 @@ const organizationSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
+
+        // //create organizations
+        // .addCase(getOrganizationListByUserId.pending, (state) => {
+        //     state.loading = true;
+        //     state.error = null;
+        // })
+        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     state.organizationListById = action.payload;
+        // })
+        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
+        //     state.loading = false;
+        //     state.error = action.payload;
+        // })
+        //
+        // //updateOrganizationById
+        // .addCase(getOrganizationListByUserId.pending, (state) => {
+        //     state.loading = true;
+        //     state.error = null;
+        // })
+        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     state.organizationListById = action.payload;
+        // })
+        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
+        //     state.loading = false;
+        //     state.error = action.payload;
+        // })
+        // //diactive organization
+        // .addCase(getOrganizationListByUserId.pending, (state) => {
+        //     state.loading = true;
+        //     state.error = null;
+        // })
+        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     state.organizationListById = action.payload;
+        // })
+        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
+        //     state.loading = false;
+        //     state.error = action.payload;
+        // });
     },
 });
 
@@ -129,5 +176,6 @@ export const {
     setSelectedOrganization,
     setOpenCreateOrganizationState,
     setEditOrganizationOpenState,
+    setSelectedEditOrganization,
 } = organizationSlice.actions;
 export default organizationSlice.reducer;

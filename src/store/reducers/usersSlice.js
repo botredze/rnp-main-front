@@ -23,26 +23,11 @@ export const getUsersList = createAsyncThunk('users/get', async (filters, { reje
     }
 });
 
-export const getUserById = createAsyncThunk(
-    'users/getById',
-    async (loginData, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.post(`${API_URL}/auth/login`, loginData);
-
-            if (response.status === 201) {
-                return response.data;
-            }
-        } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
-        }
-    }
-);
-
 export const updateUserById = createAsyncThunk(
     'users/put',
-    async (loginData, { rejectWithValue }) => {
+    async (updateUserData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(`${API_URL}/auth/login`, loginData);
+            const response = await axiosInstance.post(`${API_URL}/auth/update`, updateUserData);
 
             if (response.status === 201) {
                 return response.data;
@@ -53,11 +38,18 @@ export const updateUserById = createAsyncThunk(
     }
 );
 
-export const deleteUserById = createAsyncThunk(
-    'users/delete',
-    async (loginData, { rejectWithValue }) => {
+export const deactivateUser = createAsyncThunk(
+    'users/diactive',
+    async (deleteData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(`${API_URL}/auth/login`, loginData);
+            const { userId, action } = deleteData;
+
+            const params = new URLSearchParams();
+
+            params.append('userId', userId);
+            params.append('action', action);
+
+            const response = await axiosInstance.get(`${API_URL}/auth/deactivate`, params);
 
             if (response.status === 201) {
                 return response.data;
@@ -142,6 +134,34 @@ const userSlice = createSlice({
                 state.error = false;
             })
             .addCase(createUser.rejected, (state) => {
+                state.loading = false;
+                state.error = true;
+            })
+
+            //update user
+            .addCase(updateUserById.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(updateUserById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = false;
+            })
+            .addCase(updateUserById.rejected, (state) => {
+                state.loading = false;
+                state.error = true;
+            })
+
+            //delete user
+            .addCase(deactivateUser.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(deactivateUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = false;
+            })
+            .addCase(deactivateUser.rejected, (state) => {
                 state.loading = false;
                 state.error = true;
             });

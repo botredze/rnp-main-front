@@ -10,27 +10,28 @@ import {
 } from '../../store/reducers/organizationSlice.js';
 
 const AddOrganizationDrawer = () => {
-    const { openCreateOrganizationState, editOrganizationOpenState, organization } = useSelector(
-        (state) => state.organization
-    );
+    const { openCreateOrganizationState, editOrganizationOpenState, selectedOrganization } =
+        useSelector((state) => state.organization);
+
+    const { selectedUser } = useSelector((state) => state.users);
 
     const dispatch = useDispatch();
 
-    const isEdit = Boolean(organization);
+    const isEdit = Boolean(selectedOrganization);
 
     const [organizationName, setOrganizationName] = useState('');
     const [apiKey, setApiKey] = useState('');
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        if (organization) {
-            setOrganizationName(organization.organizationName || '');
-            setApiKey(organization.apiKey || '');
+        if (selectedOrganization) {
+            setOrganizationName(selectedOrganization.organizationName || '');
+            setApiKey(selectedOrganization.apiKey || '');
         } else {
             setOrganizationName('');
             setApiKey('');
         }
-    }, [organization]);
+    }, [selectedOrganization]);
 
     const close = () => {
         setOrganizationName('');
@@ -58,15 +59,25 @@ const AddOrganizationDrawer = () => {
         try {
             let resultAction;
 
+            console.log(isEdit, 'isEdit');
             if (isEdit) {
                 resultAction = await dispatch(
                     updateOrganizationById({
-                        id: organization.id,
-                        data,
+                        id: selectedOrganization.id,
+                        ...data,
                     })
                 );
             } else {
-                resultAction = await dispatch(createOrganization(data));
+                const payload = {
+                    organizationName,
+                    apiKey,
+                };
+
+                if (selectedUser.role === 'admin' && selectedUser.id != 0) {
+                    payload.userId = selectedUser.id;
+                }
+
+                resultAction = await dispatch(createOrganization(payload));
             }
 
             if (resultAction.meta.requestStatus === 'fulfilled') {
