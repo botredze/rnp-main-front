@@ -60,8 +60,8 @@ export const calculateUnitEconomic = (formValues) => {
     }
 
     // 7. Себестоимость
-    const costIndex = getIndex('Себестоимость итого');
-    const cost = costIndex !== -1 ? num(tableData[costIndex].value) : 0;
+    // const costIndex = getIndex('Себестоимость итого');
+    // const cost = costIndex !== -1 ? num(tableData[costIndex].value) : 0;
 
     // 8. Прибыль
     const profitIndex = getIndex('Прибыль');
@@ -99,7 +99,7 @@ export const calculateUnitEconomic = (formValues) => {
 
     // 11. Логистика >1 литра
     const priceDopLitr = getIndex(' - Цена доставки за доп. литр');
-    const priceForLitr = getIndex(' - Цена доставки за литр');
+    const priceForLitr = getIndex(' - Цена доставки за первый литр');
     const priceForLogisticBolsheLitraIndex = getIndex(' - Стоимость логистики доп литров');
     const keffStock = getIndex(' - Коэффициент склада');
     const precentVykupIndex = getIndex('Процент выкупа');
@@ -152,11 +152,14 @@ export const calculateUnitEconomic = (formValues) => {
     }
 
     //Хранение
-    const saveOnStockDayIndex = getIndex(' - Цена за хранение в день');
+    const saveOnStockDayIndex = getIndex(' - Цена хранения за первый литр');
     const saveOnStockMounthIndex = getIndex(' - Цена за хранение в месяц');
 
     const saveKeff = getIndex(' - Коэффициент храненеи на складе');
 
+    //хранение
+
+    // (стоимость хранения за литр * 1 + стоимость хранения за доп литр * количество доп литров) * коэффицент склада * предполгаемый срок хранения
     if (saveOnStockDayIndex !== -1 && saveOnStockMounthIndex !== -1 && saveKeff !== -1) {
         const priceToLirt = num(tableData[priceDopLitr].value);
         const priceToDopLirt = num(tableData[priceDopLitr].value);

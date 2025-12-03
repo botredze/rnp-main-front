@@ -22,9 +22,10 @@ const RnpMain = () => {
             rows: [
                 { label: 'Заказы', key: 'orders_count' },
                 { label: 'Продажи', key: 'sales_total_amount' },
+                { label: 'Количество продаж', key: 'sales_total_count' },
                 { label: 'Общий процент выкупа', key: 'avg_buy_out_percent' },
-                { label: 'Оборачиваемость дней', key: 'turnover_days' },
-                { label: 'Остаток кончится', key: 'stock_total' },
+                { label: 'Оборачиваемость дней', key: 'days_to_finish' },
+                { label: 'Остаток кончится', key: 'finish_date' },
             ],
         },
         {
@@ -41,6 +42,7 @@ const RnpMain = () => {
                 { label: 'Процент добавления в корзину', key: 'avg_add_to_card_conversion' },
                 { label: 'Добавили в заказ', key: 'history_orders_count' },
                 { label: 'Процент добавления в заказ', key: 'avg_card_to_order_conversion' },
+                { label: 'Органические клики', key: 'organic_clicks' },
             ],
         },
         {
@@ -67,10 +69,11 @@ const RnpMain = () => {
 
     const allRows = tables.flatMap((table) => table.rows);
 
+    console.log(statistic, 'statistic');
     return (
         <Paper
             sx={{
-                width: '100%',
+                width: showStats ? '100%' : '25%',
                 overflowX: 'auto',
             }}
         >
@@ -107,7 +110,11 @@ const RnpMain = () => {
                                         {showStats &&
                                             statistic.map((data, i) => (
                                                 <TableCell key={i} align="center">
-                                                    {data[row.key] ?? 0}
+                                                    {row.key === 'finish_date' && data[row.key]
+                                                        ? DateTime.fromISO(data[row.key]).toFormat(
+                                                              'dd.MM.yyyy'
+                                                          )
+                                                        : (data[row.key] ?? 0)}
                                                 </TableCell>
                                             ))}
                                     </TableRow>

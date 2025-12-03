@@ -16,7 +16,7 @@ const Skus = () => {
     const [selectedSku, setSelectedSku] = useState(null);
 
     const { organization } = useSelector((state) => state.organization);
-    const { productList } = useSelector((state) => state.products);
+    const { productList, selectedProduct } = useSelector((state) => state.products);
 
     const dispatch = useDispatch();
 
@@ -26,12 +26,17 @@ const Skus = () => {
         }
     }, [organization]);
 
+    useEffect(() => {
+        if (selectedProduct.id !== 0) {
+            setSelectedSku(selectedProduct);
+        }
+    }, [selectedProduct]);
+
     const handleSelect = (value) => {
         const foundSku = productList.find((item) => String(item.id) === String(value));
         setSelectedSku(foundSku);
 
         if (!!value) {
-            //dispatch(getProductRnpStatistic({ productId: selectedSku }));
             dispatch(setSelectedProduct(foundSku));
         }
     };
@@ -94,10 +99,10 @@ const Skus = () => {
                     <div className="sizesTable">
                         <table>
                             <tbody>
-                                {selectedSku?.sizes?.map((size) => (
-                                    <tr key={size.chrtID || size.techSize}>
-                                        <td>{size.techSize || size.wbSize}</td>
-                                        <td>{size.qty ?? 0}</td>
+                                {selectedSku?.metricsCalculated?.sizes_left?.map((size) => (
+                                    <tr key={size.size || size.quantity}>
+                                        <td>{size.size || size.wbSize}</td>
+                                        <td>{size.quantity ?? 0}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -105,9 +110,15 @@ const Skus = () => {
                     </div>
 
                     <Group mt="md" justify="space-between">
-                        <Text size="sm">Процент выкупа: 18%</Text>
-                        <Text size="sm">Хватит на: 15 дн</Text>
-                        <Text size="sm">Капитализация остатков: 15 000 ₽</Text>
+                        <Text size="sm">
+                            Процент выкупа:
+                            {`  ${parseInt(selectedSku?.metricsCalculated?.avg_buy_out_percent_5_days)}`}
+                            %
+                        </Text>
+                        <Text size="sm">
+                            Капитализация остатков:
+                            {`  ${parseInt(selectedSku?.metricsCalculated?.capitalization_rub)}`} ₽
+                        </Text>
                     </Group>
                 </Card>
             )}
