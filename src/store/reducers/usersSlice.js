@@ -27,7 +27,7 @@ export const updateUserById = createAsyncThunk(
     'users/put',
     async (updateUserData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(`${API_URL}/auth/update`, updateUserData);
+            const response = await axiosInstance.post(`${API_URL}/users/update`, updateUserData);
 
             if (response.status === 201) {
                 return response.data;
@@ -47,9 +47,9 @@ export const deactivateUser = createAsyncThunk(
             const params = new URLSearchParams();
 
             params.append('userId', userId);
-            params.append('action', action);
+            params.append('status', action);
 
-            const response = await axiosInstance.get(`${API_URL}/auth/deactivate`, params);
+            const response = await axiosInstance.get(`${API_URL}/users/deactivate`, { params });
 
             if (response.status === 201) {
                 return response.data;

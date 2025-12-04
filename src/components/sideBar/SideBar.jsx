@@ -9,7 +9,6 @@ import {
     setSelectedOrganization,
 } from '../../store/reducers/organizationSlice.js';
 import { logout } from '../../store/reducers/authSlice.js';
-import { getOrganizationProductLis } from '../../store/reducers/productsSlice.js';
 
 const SideBar = () => {
     const [selectedIP, setSelectedIP] = useState(null);
@@ -18,13 +17,26 @@ const SideBar = () => {
 
     const { organizationList, organization } = useSelector((state) => state.organization);
 
+    // Загрузка списка организаций при монтировании компонента
     useEffect(() => {
         dispatch(getOrganizationList());
-        if (organizationList.length > 0 && organizationList?.[0].id > 0 && organization.id === 0) {
-            setSelectedIP(String(organizationList[0].id));
-            dispatch(setSelectedOrganization(organizationList[0]));
+    }, [dispatch]);
+
+    // Установка первой организации по умолчанию
+    useEffect(() => {
+        if (organizationList.length > 0 && !organization.id) {
+            const firstOrg = organizationList[0];
+            setSelectedIP(String(firstOrg.id));
+            dispatch(setSelectedOrganization(firstOrg));
         }
-    }, [organization]);
+    }, [organizationList, organization.id, dispatch]);
+
+    // Синхронизация selectedIP с выбранной организацией
+    useEffect(() => {
+        if (organization.id) {
+            setSelectedIP(String(organization.id));
+        }
+    }, [organization.id]);
 
     const handleSelectChange = (value) => {
         setSelectedIP(value);
@@ -56,7 +68,7 @@ const SideBar = () => {
                 >
                     Юнит экономика
                 </NavLink>
-                <NavLink to="/about" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
+                <NavLink to="/reports" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
                     Отчеты
                 </NavLink>
                 <NavLink
@@ -69,12 +81,6 @@ const SideBar = () => {
                 <NavLink to="/admin" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
                     Админка
                 </NavLink>
-                {/*<NavLink*/}
-                {/*    to="/settings"*/}
-                {/*    className={({ isActive }) => (isActive ? 'activeLink' : '')}*/}
-                {/*>*/}
-                {/*    Мой профиль*/}
-                {/*</NavLink>*/}
 
                 <button className="logoutButton" onClick={handleLogout}>
                     Выйти

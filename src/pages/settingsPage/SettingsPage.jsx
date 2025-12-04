@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './style.scss';
 import { Button, Table } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    diactiveOrganization,
     getOrganizationList,
     setEditOrganizationOpenState,
     setOpenCreateOrganizationState,
@@ -10,11 +11,15 @@ import {
 } from '../../store/reducers/organizationSlice.js';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { statusMapper } from '../../helpers/mapper.js';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import AddOrganizationDrawer from '../../components/addOrganizationDrawer/AddOrganizationDrawer.jsx';
+import ConfirmAlert from '../../components/configAlert/confirmAlert.jsx';
 
 const SettingsPage = () => {
     const dispatch = useDispatch();
+
+    const [selectedOrd, setSelectedOrganization] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getOrganizationList());
@@ -30,6 +35,22 @@ const SettingsPage = () => {
     const openEditDrawer = (data) => {
         dispatch(setEditOrganizationOpenState(true));
         dispatch(setSelectedEditOrganization(data));
+    };
+
+    const openConfirmDelete = (data) => {
+        setSelectedOrganization(data);
+        setDeleteModalOpen(true);
+    };
+
+    const closeConfirmDelete = () => {
+        setDeleteModalOpen(false);
+        setSelectedOrganization(null);
+    };
+
+    const deleteUser = () => {
+        dispatch(diactiveOrganization({ organizationId: selectedOrd.id, action: 'delete' }));
+        dispatch(getOrganizationList());
+        closeConfirmDelete();
     };
 
     return (
@@ -90,6 +111,20 @@ const SettingsPage = () => {
                                     >
                                         Редактировать
                                     </Button>
+
+                                    <Button
+                                        variant="outline"
+                                        radius="md"
+                                        sx={{
+                                            color: '#D91616',
+                                            borderColor: '#D91616',
+                                            '&:hover': { backgroundColor: '#ffe5e5' },
+                                        }}
+                                        leftSection={<IconTrash size={16} />}
+                                        onClick={() => openConfirmDelete(org)}
+                                    >
+                                        Удалить
+                                    </Button>
                                 </Table.Td>
                             </Table.Tr>
                         ))}
@@ -98,6 +133,14 @@ const SettingsPage = () => {
             </div>
 
             <AddOrganizationDrawer />
+
+            <ConfirmAlert
+                openState={deleteModalOpen}
+                onClose={closeConfirmDelete}
+                onConfirm={deleteUser}
+                title="Удаление"
+                message={`Вы действительно хотите удалить профиль ${selectedOrd?.organizationName}`}
+            />
         </div>
     );
 };

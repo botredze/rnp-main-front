@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/reducers/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { TextInput, PasswordInput, Button } from '@mantine/core';
 import logo from '../../assets/logos/mainLogo.png';
 import './style.scss';
 
@@ -10,7 +11,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error, token } = useSelector((state) => state.auth);
+    const { loading, error } = useSelector((state) => state.auth);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,30 +32,40 @@ const LoginPage = () => {
                 <form className="loginForm" onSubmit={handleSubmit}>
                     <div className="formGroup">
                         <label htmlFor="login">Логин</label>
-                        <input
+                        <TextInput
                             id="login"
-                            type="text"
                             placeholder="Введите логин"
                             value={login}
                             onChange={(e) => setLogin(e.target.value)}
                             required
+                            styles={{
+                                input: { fontSize: '1rem', padding: '0.7rem 0.9rem' },
+                            }}
                         />
                     </div>
                     <div className="formGroup">
                         <label htmlFor="password">Пароль</label>
-                        <input
+                        <PasswordInput
                             id="password"
-                            type="password"
                             placeholder="Введите пароль"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            styles={{
+                                input: { fontSize: '1rem', padding: '0.7rem 0.9rem' },
+                            }}
                         />
                     </div>
                     {error && <div className="error">{error}</div>}
-                    <button type="submit" className="loginButton" disabled={loading}>
-                        {loading ? 'Вход...' : 'Войти'}
-                    </button>
+                    <Button
+                        variant="light"
+                        type="submit"
+                        className="loginButton"
+                        fullWidth
+                        loading={loading}
+                    >
+                        Войти
+                    </Button>
                 </form>
             </div>
         </div>

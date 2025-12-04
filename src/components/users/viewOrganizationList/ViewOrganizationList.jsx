@@ -11,8 +11,9 @@ import {
     setOpenCreateOrganizationState,
     setSelectedEditOrganization,
 } from '../../../store/reducers/organizationSlice.js';
+import CheckIcon from '@mui/icons-material/Check';
 
-const ViewOrganizationList = ({ openEditModal }) => {
+const ViewOrganizationList = ({ openEditModal, openActivateOrg }) => {
     const { viewOrganizationModal, selectedUser } = useSelector((state) => state.users);
     const { organizationListById } = useSelector((state) => state.organization);
     const dispatch = useDispatch();
@@ -34,9 +35,13 @@ const ViewOrganizationList = ({ openEditModal }) => {
     };
 
     const openDiactiveOrg = (data) => {
-        console.log(data, 'data ');
         dispatch(setViewOrganizationModal(false));
         openEditModal(data);
+    };
+
+    const openActiveOrg = (data) => {
+        dispatch(setViewOrganizationModal(false));
+        openActivateOrg(data);
     };
 
     return (
@@ -101,15 +106,27 @@ const ViewOrganizationList = ({ openEditModal }) => {
                                                 Редактировать
                                             </Button>
 
-                                            <Button
-                                                variant="light"
-                                                color="orange"
-                                                radius="md"
-                                                leftSection={<IconBan size={16} />}
-                                                onClick={() => openDiactiveOrg(org)}
-                                            >
-                                                Деактивировать
-                                            </Button>
+                                            {org.status === 'inactive' ? (
+                                                <Button
+                                                    variant="light"
+                                                    color="green"
+                                                    radius="md"
+                                                    leftSection={<CheckIcon size={16} />}
+                                                    onClick={() => openActiveOrg(org)}
+                                                >
+                                                    Активировать
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="light"
+                                                    color="orange"
+                                                    radius="md"
+                                                    leftSection={<IconBan size={16} />}
+                                                    onClick={() => openDiactiveOrg(org)}
+                                                >
+                                                    Деактивировать
+                                                </Button>
+                                            )}
                                         </div>
                                     </Table.Td>
                                 </Table.Tr>

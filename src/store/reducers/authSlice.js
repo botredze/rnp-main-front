@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import { API_URL } from '../../components/env/env.js';
 
 export const loginUser = createAsyncThunk('auth/login', async (loginData, { rejectWithValue }) => {
+    console.log(loginData, 'loginData');
     try {
         const response = await axios.post(`${API_URL}/auth/login`, loginData);
 
@@ -22,7 +23,7 @@ const authSlice = createSlice({
         user: null,
         token: null,
         loading: false,
-        error: null,
+        error: false,
     },
     reducers: {
         logout: (state) => {
@@ -33,7 +34,7 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loginUser.pending, (state) => {
-                state.loading = true;
+                state.loading = false;
                 state.error = null;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
@@ -55,4 +56,5 @@ const persistConfig = {
 };
 
 export const { logout } = authSlice.actions;
+
 export default persistReducer(persistConfig, authSlice.reducer);

@@ -83,6 +83,27 @@ export const createOrganization = createAsyncThunk(
     }
 );
 
+export const diactiveOrganization = createAsyncThunk(
+    'organization/createOrganization',
+    async (organization, { rejectWithValue }) => {
+        const { organizationId, action } = organization;
+        const params = new URLSearchParams();
+
+        params.append('organizationId', organizationId);
+        params.append('action', action);
+
+        try {
+            const response = await axiosInstance.get(`/organization/deactivate`, { params });
+
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
 const organizationSlice = createSlice({
     name: 'organization',
     initialState,
@@ -127,21 +148,20 @@ const organizationSlice = createSlice({
             .addCase(getOrganizationListByUserId.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
 
-        // //create organizations
-        // .addCase(getOrganizationListByUserId.pending, (state) => {
-        //     state.loading = true;
-        //     state.error = null;
-        // })
-        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     state.organizationListById = action.payload;
-        // })
-        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.payload;
-        // })
+            //create organizations
+            .addCase(diactiveOrganization.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(diactiveOrganization.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(diactiveOrganization.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
         //
         // //updateOrganizationById
         // .addCase(getOrganizationListByUserId.pending, (state) => {

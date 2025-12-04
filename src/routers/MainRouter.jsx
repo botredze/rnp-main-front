@@ -7,6 +7,7 @@ import MainLayouts from '../components/layouts/MainLayouts.jsx';
 import { useSelector } from 'react-redux';
 import SettingsPage from '../pages/settingsPage/SettingsPage.jsx';
 import AdminPanel from '../pages/adminPanel/AdminPanel.jsx';
+import FinanceReportPage from '../pages/FinanceReportPage/FinanceReportPage.jsx';
 
 const PrivateRoute = ({ children }) => {
     const token = useSelector((state) => state.auth.token);
@@ -27,11 +28,21 @@ const MainRouter = () => {
                         </PrivateRoute>
                     }
                 />
+
                 <Route
                     path="/unitEconomic"
                     element={
                         <PrivateRoute>
                             <UnitEconomicPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/reports"
+                    element={
+                        <PrivateRoute>
+                            <FinanceReportPage />
                         </PrivateRoute>
                     }
                 />

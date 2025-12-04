@@ -9,6 +9,7 @@ import {
     userStatusMap,
 } from '../../components/helpers/usersMap.js';
 import {
+    deactivateUser,
     getUsersList,
     setAddUserState,
     setEditOrganizationModal,
@@ -17,7 +18,10 @@ import {
     setViewOrganizationModal,
 } from '../../store/reducers/usersSlice.js';
 import { IconEdit, IconTrash, IconBan } from '@tabler/icons-react';
-import { getOrganizationListByUserId } from '../../store/reducers/organizationSlice.js';
+import {
+    diactiveOrganization,
+    getOrganizationListByUserId,
+} from '../../store/reducers/organizationSlice.js';
 import ViewOrganizationList from '../../components/users/viewOrganizationList/ViewOrganizationList.jsx';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ConfirmAlert from '../../components/configAlert/confirmAlert.jsx';
@@ -37,6 +41,9 @@ const AdminPanel = () => {
     const [dicativeOrg, setDiactiveOrg] = useState(false);
     const [selectedOrganization, setSelectedOrganization] = useState(null);
 
+    const [activeConfirmModalOpen, setActiveConfirmModalOpen] = useState(false);
+    const [activeOrganization, setActiveOrganization] = useState(null);
+
     useEffect(() => {
         const params = {};
 
@@ -46,7 +53,7 @@ const AdminPanel = () => {
         dispatch(getUsersList(params));
     }, [selectedStatus, selectedRole]);
 
-    const { usersList } = useSelector((state) => state.users);
+    const { usersList, filterParams, selectedUser: user } = useSelector((state) => state.users);
 
     const openAddUserModal = () => {
         dispatch(setSelectedUser(null));
@@ -79,7 +86,8 @@ const AdminPanel = () => {
     };
 
     const deleteUser = () => {
-        dispatch();
+        dispatch(deactivateUser({ userId: selectedUser.id, action: 'delete' }));
+        dispatch(getUsersList(filterParams));
         closeConfirmDelete();
     };
 
@@ -93,7 +101,11 @@ const AdminPanel = () => {
         setSelectedUserItem(null);
     };
 
-    const dicativeUser = () => {};
+    const dicativeUser = () => {
+        dispatch(deactivateUser({ userId: selectedUser.id, action: 'diactive' }));
+        dispatch(getUsersList(filterParams));
+        closeDiactiveModalConfirm();
+    };
 
     const editUserDrawer = (data) => {
         dispatch(setEditOrganizationModal(true));
@@ -101,7 +113,6 @@ const AdminPanel = () => {
     };
 
     const openDiactiveOrganization = (data) => {
-        console.log(data, 'data');
         setDiactiveOrg(true);
         setSelectedOrganization(data);
     };
@@ -111,7 +122,29 @@ const AdminPanel = () => {
         setSelectedOrganization(null);
     };
 
-    const confirmDiactiveOrganization = () => {};
+    const confirmDiactiveOrganization = () => {
+        dispatch(
+            diactiveOrganization({ organizationId: selectedOrganization.id, action: 'diactive' })
+        );
+        dispatch(getOrganizationListByUserId({ userId: user.id }));
+        closeDiactiveOrganization();
+    };
+
+    const openActiveOrganization = (data) => {
+        setActiveConfirmModalOpen(true);
+        setActiveOrganization(data);
+    };
+
+    const closeActiveOrganization = () => {
+        setActiveConfirmModalOpen(false);
+        setActiveOrganization(null);
+    };
+
+    const activeOrganizationConfirm = () => {
+        dispatch(diactiveOrganization({ organizationId: activeOrganization.id, action: 'active' }));
+        dispatch(getOrganizationListByUserId({ userId: user.id }));
+        closeActiveOrganization();
+    };
 
     const rows = usersList.map((user, index) => (
         <Table.Tr key={user.id}>
@@ -271,7 +304,10 @@ const AdminPanel = () => {
             </div>
 
             <AddUserModal />
-            <ViewOrganizationList openEditModal={openDiactiveOrganization} />
+            <ViewOrganizationList
+                openEditModal={openDiactiveOrganization}
+                openActivateOrg={openActiveOrganization}
+            />
 
             <AddOrganizationDrawer />
             <ConfirmAlert
@@ -296,6 +332,14 @@ const AdminPanel = () => {
                 onConfirm={confirmDiactiveOrganization}
                 title="Деактивация"
                 message={`Вы действительно хотите деактивировать профиль ${selectedOrganization?.organizationName}`}
+            />
+
+            <ConfirmAlert
+                openState={activeConfirmModalOpen}
+                onClose={closeActiveOrganization}
+                onConfirm={activeOrganizationConfirm}
+                title="Активация"
+                message={`Вы действительно хотите активировать профиль ${activeOrganization?.organizationName}`}
             />
         </div>
     );

@@ -59,7 +59,6 @@ const AddOrganizationDrawer = () => {
         try {
             let resultAction;
 
-            console.log(isEdit, 'isEdit');
             if (isEdit) {
                 resultAction = await dispatch(
                     updateOrganizationById({
