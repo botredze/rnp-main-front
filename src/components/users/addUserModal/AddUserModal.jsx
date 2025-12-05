@@ -67,6 +67,8 @@ const AddUserModal = () => {
             role,
         };
 
+        console.log(userData, 'userData');
+
         if (!isEdit) {
             userData.password = password;
         } else {

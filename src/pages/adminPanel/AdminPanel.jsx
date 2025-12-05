@@ -44,14 +44,21 @@ const AdminPanel = () => {
     const [activeConfirmModalOpen, setActiveConfirmModalOpen] = useState(false);
     const [activeOrganization, setActiveOrganization] = useState(null);
 
+    const { role: currentRole } = useSelector((state) => state.auth);
+
     useEffect(() => {
         const params = {};
 
         if (selectedStatus) params.status = selectedStatus;
-        if (selectedRole) params.role = selectedRole;
+
+        if (currentRole === 'managers') {
+            params.role = 'users';
+        } else {
+            if (selectedRole) params.role = selectedRole;
+        }
 
         dispatch(getUsersList(params));
-    }, [selectedStatus, selectedRole]);
+    }, [selectedStatus, selectedRole, currentRole]);
 
     const { usersList, filterParams, selectedUser: user } = useSelector((state) => state.users);
 

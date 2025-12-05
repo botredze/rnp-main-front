@@ -17,6 +17,8 @@ const SideBar = () => {
 
     const { organizationList, organization } = useSelector((state) => state.organization);
 
+    const { user, role } = useSelector((state) => state.auth);
+
     // Загрузка списка организаций при монтировании компонента
     useEffect(() => {
         dispatch(getOrganizationList());
@@ -78,9 +80,15 @@ const SideBar = () => {
                     Настройки
                 </NavLink>
 
-                <NavLink to="/admin" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
-                    Админка
-                </NavLink>
+                {role === 'admins' ||
+                    (role === 'managers' && (
+                        <NavLink
+                            to="/admin"
+                            className={({ isActive }) => (isActive ? 'activeLink' : '')}
+                        >
+                            Админ панель
+                        </NavLink>
+                    ))}
 
                 <button className="logoutButton" onClick={handleLogout}>
                     Выйти

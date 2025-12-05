@@ -10,6 +10,7 @@ export const loginUser = createAsyncThunk('auth/login', async (loginData, { reje
         const response = await axios.post(`${API_URL}/auth/login`, loginData);
 
         if (response.status === 201) {
+            console.log(response.data, 'response.data');
             return response.data;
         }
     } catch (error) {
@@ -24,6 +25,7 @@ const authSlice = createSlice({
         token: null,
         loading: false,
         error: false,
+        role: null,
     },
     reducers: {
         logout: (state) => {
@@ -40,6 +42,7 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload.user;
+                state.role = action.payload.role;
                 state.token = action.payload.token;
             })
             .addCase(loginUser.rejected, (state, action) => {

@@ -59,17 +59,6 @@ export const calculateUnitEconomic = (formValues) => {
         remainingPrice -= deducted;
     }
 
-    // 7. Себестоимость
-    // const costIndex = getIndex('Себестоимость итого');
-    // const cost = costIndex !== -1 ? num(tableData[costIndex].value) : 0;
-
-    // 8. Прибыль
-    const profitIndex = getIndex('Прибыль');
-    if (profitIndex !== -1) {
-        const profit = remainingPrice - cost;
-        tableData[profitIndex].value = parseFloat(profit.toFixed(1));
-    }
-
     // 9. Габариты товара
     const x = num(tableData[getIndex(' - Ширина товара')]?.value);
     const y = num(tableData[getIndex(' - Высота товара')]?.value);
@@ -151,31 +140,135 @@ export const calculateUnitEconomic = (formValues) => {
         }
     }
 
-    //Хранение
-    const saveOnStockDayIndex = getIndex(' - Цена хранения за первый литр');
-    const saveOnStockMounthIndex = getIndex(' - Цена за хранение в месяц');
-
-    const saveKeff = getIndex(' - Коэффициент храненеи на складе');
-
-    //хранение
-
     // (стоимость хранения за литр * 1 + стоимость хранения за доп литр * количество доп литров) * коэффицент склада * предполгаемый срок хранения
-    if (saveOnStockDayIndex !== -1 && saveOnStockMounthIndex !== -1 && saveKeff !== -1) {
-        const priceToLirt = num(tableData[priceDopLitr].value);
-        const priceToDopLirt = num(tableData[priceDopLitr].value);
-        const saveKeffValue = num(tableData[saveKeff].percent);
+    // === Хранение ===
 
-        const savetyPriceDay = (priceToLirt + priceToDopLirt) * (saveKeffValue / 100);
-        tableData[saveOnStockDayIndex].value = parseFloat(savetyPriceDay.toFixed(2));
-        tableData[saveOnStockMounthIndex].value = parseFloat(
-            parseFloat(savetyPriceDay.toFixed(2)) * 30
-        ).toFixed(2);
+    const savePriceFirstIndex = getIndex(' - Цена хранения за первый литр');
+    const savePriceExtraIndex = getIndex(' - Цена хранения за доп литры');
+    const saveDaysIndex = getIndex(' - Предпологаемый срок хранения');
+    const saveMonthIndex = getIndex(' - Цена за хранение в месяц');
+    const saveCoeffIndex = getIndex(' - Коэффициент храненеи на складе');
+
+    if (
+        savePriceFirstIndex !== -1 &&
+        savePriceExtraIndex !== -1 &&
+        saveDaysIndex !== -1 &&
+        saveCoeffIndex !== -1 &&
+        saveMonthIndex !== -1
+    ) {
+        const priceFirst = num(tableData[savePriceFirstIndex].value); // цена за 1 литр
+        const priceExtra = num(tableData[savePriceExtraIndex].value); // цена за доп литры
+        const dopLiters = num(tableData[getIndex(' - Обьем доп литров')]?.value);
+        const coeff = num(tableData[saveCoeffIndex].percent); // %
+        const days = num(tableData[saveDaysIndex].value); // дни
+
+        const dailyStorage = (priceFirst + priceExtra * dopLiters) * (coeff / 100);
+
+        tableData[savePriceFirstIndex].value = parseFloat(dailyStorage.toFixed(2));
+
+        const totalStorage = dailyStorage * days;
+
+        tableData[saveMonthIndex].value = parseFloat(totalStorage.toFixed(2));
     }
 
-    const finalWbKomiccia = getIndex('Итоговая комиссия WB');
+    // 8.1. Брак и потери
+    const defectIndex = getIndex(' - Брак и потери');
+    const defectPercentIndex = getIndex(' - Процент брака или потерь');
 
-    if (finalWbKomiccia !== -1) {
+    if (defectIndex !== -1 && defectPercentIndex !== -1) {
+        const defectPercent = num(tableData[defectPercentIndex].percent); // процент
+        const defectCost = fixedRemainingPrice * (defectPercent / 100); // цена * %
+
+        tableData[defectIndex].value = parseFloat(defectCost.toFixed(2));
+    }
+
+    const incomeIndex = getIndex('Доход от продажи');
+    const toPayWbIndex = getIndex('К перечислению от WB');
+
+    if (incomeIndex !== -1) {
+        const sppValue = num(tableData[sspIndex].value);
+        tableData[incomeIndex].value = parseFloat(sppValue.toFixed(0));
+    }
+
+    if (toPayWbIndex !== -1) {
+        const notSppPrice = num(tableData[priceIndex].value);
+
+        const kommProcent = num(tableData[wbIndex].percent);
+
+        const kommPrice = notSppPrice * (kommProcent / 100);
+
+        const toPaySumm = notSppPrice - kommPrice;
+
+        tableData[toPayWbIndex].value = parseFloat(toPaySumm.toFixed(2));
+    }
+
+    // === Доп. расчёты ===
+
+    // 1. Расходы на единицу = Себестоимость + логистика + хранение + эквайринг + реклама + брак/потери
+    const expenseIndex = getIndex('Рассходы на еденицу');
+
+    // const costIndex = getIndex('Себестоимость итого');
+    // const cost = costIndex !== -1 ? num(tableData[costIndex].value) : 0;
+
+    // Логистика
+    const logistic = num(tableData[getIndex('Логистика c учетом % выкупа')]?.value);
+
+    // Хранение
+    const storage = num(tableData[getIndex(' - Цена за хранение в месяц')]?.value);
+
+    // Эквайринг
+    const acquiring = num(tableData[getIndex('Эквайринг')]?.value);
+
+    // Реклама
+    const ads = num(tableData[getIndex('Реклама')]?.value);
+
+    // Брак и потери
+    const defect = num(tableData[getIndex(' - Брак и потери')]?.value);
+
+    const cost = num(tableData[expenseIndex]?.value);
+
+    // Итог расхода
+    const totalExpense = cost + logistic + storage + acquiring + ads + defect;
+
+    if (expenseIndex !== -1) {
+        tableData[expenseIndex].value = parseFloat(totalExpense.toFixed(2));
+    }
+
+    // 2. Валовая прибыль = К перечислению от WB - расходы
+    const grossProfitIndex = getIndex('Валовая прибыль');
+    const toPay = num(tableData[getIndex('К перечислению от WB')]?.value);
+
+    if (grossProfitIndex !== -1) {
+        const gross = toPay - totalExpense;
+        tableData[grossProfitIndex].value = parseFloat(gross.toFixed(2));
+    }
+
+    // 3. Маржинальность (%) = Валовая прибыль / Цена до СПП * 100
+    const marginIndex = getIndex('Маржинальность');
+    const basePrice = num(tableData[getIndex('Цена на WB наша')]?.value);
+
+    if (marginIndex !== -1 && basePrice > 0) {
+        const gross = num(tableData[grossProfitIndex]?.value);
+        const margin = (gross / basePrice) * 100;
+        tableData[marginIndex].percent = parseFloat(margin.toFixed(2));
+        tableData[marginIndex].value = parseFloat(margin.toFixed(2));
+    }
+
+    // 4. ROI = Валовая прибыль / себестоимость * 100
+    const roiIndex = getIndex('ROI за единицу');
+
+    if (roiIndex !== -1) {
+        const gross = num(tableData[grossProfitIndex]?.value);
+        console.log(gross, 'gross');
+        console.log(cost, 'cost');
+        const roi = (gross / cost) * 100;
+        tableData[roiIndex].percent = parseFloat(roi.toFixed(2));
     }
 
     return { ...formValues, tableData };
 };
+
+// Рассход на еденицу  = Себестоимость + логистика + хранение за день + эквайринг + реклама + брак и потери
+// валомавая прибвыль = к перечислению от вб - расход на еденицу
+// маржинальность в процентах= валомавая прибыль - цена до спп
+// ROI в процентах =  валовая прибыль / себестоимость
