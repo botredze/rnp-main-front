@@ -81,15 +81,14 @@ const SideBar = () => {
                     Настройки
                 </NavLink>
 
-                {role === 'admins' ||
-                    (role === 'managers' && (
-                        <NavLink
-                            to="/admin"
-                            className={({ isActive }) => (isActive ? 'activeLink' : '')}
-                        >
-                            Админ панель
-                        </NavLink>
-                    ))}
+                {(role === 'admins' || role === 'managers') && (
+                    <NavLink
+                        to="/admin"
+                        className={({ isActive }) => (isActive ? 'activeLink' : '')}
+                    >
+                        Админ панель
+                    </NavLink>
+                )}
 
                 <button className="logoutButton" onClick={handleLogout}>
                     Выйти
