@@ -21,7 +21,7 @@ export const getProductListByOrganization = createAsyncThunk(
         const { organizationId } = props;
         try {
             const response = await axiosInstance.get(
-                `${API_URL}/unit-economic/list?organizationId=${organizationId}`
+                `/unit-economic/list?organizationId=${organizationId}`
             );
 
             if (response.status === 200) {
@@ -38,9 +38,7 @@ export const getProductById = createAsyncThunk(
     async (props, { dispatch, rejectWithValue }) => {
         const { productId } = props;
         try {
-            const response = await axiosInstance.get(
-                `${API_URL}/unit-economic?productId=${productId}`
-            );
+            const response = await axiosInstance.get(`/unit-economic?productId=${productId}`);
 
             if (response.status === 200) {
                 return response.data;
@@ -55,7 +53,7 @@ export const createProductByOrganization = createAsyncThunk(
     'unitEconomic/createProductByOrganization',
     async (formData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(`${API_URL}/unit-economic/create`, formData);
+            const response = await axiosInstance.post(`/unit-economic/create`, formData);
 
             if (response.status === 201) {
                 return response.data;

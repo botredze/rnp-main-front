@@ -13,7 +13,7 @@ export const getUsersList = createAsyncThunk('users/get', async (filters, { reje
     if (order) params.append('order', order);
 
     try {
-        const response = await axiosInstance.get(`${API_URL}/users/list`, { params });
+        const response = await axiosInstance.get(`/users/list`, { params });
 
         if (response.status === 200) {
             return response.data;
@@ -27,7 +27,7 @@ export const updateUserById = createAsyncThunk(
     'users/put',
     async (updateUserData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(`${API_URL}/users/update`, updateUserData);
+            const response = await axiosInstance.post(`/users/update`, updateUserData);
 
             if (response.status === 201) {
                 return response.data;
@@ -49,7 +49,7 @@ export const deactivateUser = createAsyncThunk(
             params.append('userId', userId);
             params.append('status', action);
 
-            const response = await axiosInstance.get(`${API_URL}/users/deactivate`, { params });
+            const response = await axiosInstance.get(`/users/deactivate`, { params });
 
             if (response.status === 201) {
                 return response.data;
@@ -62,7 +62,7 @@ export const deactivateUser = createAsyncThunk(
 
 export const createUser = createAsyncThunk('users/create', async (body, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post(`${API_URL}/users/create`, body);
+        const response = await axiosInstance.post(`/users/create`, body);
 
         if (response.status === 201) {
             return response.data;
