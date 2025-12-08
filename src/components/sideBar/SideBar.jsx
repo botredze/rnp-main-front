@@ -19,6 +19,7 @@ const SideBar = () => {
 
     const { user, role } = useSelector((state) => state.auth);
 
+    console.log(role, 'role');
     // Загрузка списка организаций при монтировании компонента
     useEffect(() => {
         dispatch(getOrganizationList());
