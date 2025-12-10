@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Select } from '@mantine/core';
+import { Select, ActionIcon, Tooltip } from '@mantine/core';
+import {
+    IconChartBar,
+    IconCoin,
+    IconFileAnalytics,
+    IconSettings,
+    IconShield,
+    IconLogout,
+    IconChevronLeft,
+    IconChevronRight,
+} from '@tabler/icons-react';
 import './style.scss';
 import mainLogo from '../../assets/logos/mainLogo.png';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,20 +22,17 @@ import { logout } from '../../store/reducers/authSlice.js';
 
 const SideBar = () => {
     const [selectedIP, setSelectedIP] = useState(null);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { organizationList, organization } = useSelector((state) => state.organization);
-
     const { user, role } = useSelector((state) => state.auth);
 
-    console.log(role, 'role');
-    // Загрузка списка организаций при монтировании компонента
     useEffect(() => {
         dispatch(getOrganizationList());
     }, [dispatch]);
 
-    // Установка первой организации по умолчанию
     useEffect(() => {
         if (organizationList.length > 0 && !organization.id) {
             const firstOrg = organizationList[0];
@@ -34,7 +41,6 @@ const SideBar = () => {
         }
     }, [organizationList, organization.id, dispatch]);
 
-    // Синхронизация selectedIP с выбранной организацией
     useEffect(() => {
         if (organization.id) {
             setSelectedIP(String(organization.id));
@@ -50,65 +56,99 @@ const SideBar = () => {
     };
 
     const handleLogout = () => {
-        dispatch(logout()); // очищает user/token в redux
-        localStorage.clear(); // очищает localStorage полностью
-        navigate('/login'); // перенаправление
+        dispatch(logout());
+        localStorage.clear();
+        navigate('/login');
     };
 
+    const toggleSidebar = () => {
+        setIsCollapsed(!isCollapsed);
+    };
+
+    const menuItems = [
+        { to: '/', label: 'РНП Аналитика', icon: <IconChartBar size={20} /> },
+        { to: '/unitEconomic', label: 'Юнит экономика', icon: <IconCoin size={20} /> },
+        { to: '/reports', label: 'Отчеты', icon: <IconFileAnalytics size={20} /> },
+        { to: '/settings', label: 'Настройки', icon: <IconSettings size={20} /> },
+    ];
+
+    if (role === 'admins' || role === 'managers') {
+        menuItems.push({
+            to: '/admin',
+            label: 'Админ панель',
+            icon: <IconShield size={20} />,
+        });
+    }
+
     return (
-        <aside className="sidebar">
-            <div className="logoImage">
-                <img src={mainLogo} alt="logo" />
+        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+            <div className="sidebarHeader">
+                <ActionIcon
+                    onClick={toggleSidebar}
+                    variant="subtle"
+                    color="dark"
+                    className="toggleButton"
+                    size="lg"
+                >
+                    {isCollapsed ? <IconChevronRight size={20} /> : <IconChevronLeft size={20} />}
+                </ActionIcon>
+
+                <div className="logoImage">
+                    <img src={mainLogo} alt="logo" />
+                </div>
             </div>
 
             <nav className="sidebarNav">
-                <NavLink to="/" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
-                    РНП Аналитика
-                </NavLink>
-                <NavLink
-                    to="/unitEconomic"
-                    className={({ isActive }) => (isActive ? 'activeLink' : '')}
-                >
-                    Юнит экономика
-                </NavLink>
-                <NavLink to="/reports" className={({ isActive }) => (isActive ? 'activeLink' : '')}>
-                    Отчеты
-                </NavLink>
-                <NavLink
-                    to="/settings"
-                    className={({ isActive }) => (isActive ? 'activeLink' : '')}
-                >
-                    Настройки
-                </NavLink>
-
-                {(role === 'admins' || role === 'managers') && (
-                    <NavLink
-                        to="/admin"
-                        className={({ isActive }) => (isActive ? 'activeLink' : '')}
+                {menuItems.map((item) => (
+                    <Tooltip
+                        label={item.label}
+                        position="right"
+                        disabled={!isCollapsed}
+                        key={item.to}
                     >
-                        Админ панель
-                    </NavLink>
-                )}
+                        <NavLink
+                            to={item.to}
+                            className={({ isActive }) => (isActive ? 'activeLink' : '')}
+                        >
+                            <span className="navIcon">{item.icon}</span>
+                            {!isCollapsed && <span className="navLabel">{item.label}</span>}
+                        </NavLink>
+                    </Tooltip>
+                ))}
 
-                <button className="logoutButton" onClick={handleLogout}>
-                    Выйти
-                </button>
+                <Tooltip label="Выйти" position="right" disabled={!isCollapsed}>
+                    <button className="logoutButton" onClick={handleLogout}>
+                        <span className="navIcon">
+                            <IconLogout size={20} />
+                        </span>
+                        {!isCollapsed && <span className="navLabel">Выйти</span>}
+                    </button>
+                </Tooltip>
             </nav>
 
-            <div className="sidebarFooter">
-                <Select
-                    label="Выберите ИП"
-                    placeholder="Выбрать ИП"
-                    data={organizationList.map((org) => ({
-                        value: String(org.id),
-                        label: org.organizationName,
-                    }))}
-                    value={selectedIP}
-                    onChange={handleSelectChange}
-                    radius="md"
-                    size="sm"
-                />
-            </div>
+            {!isCollapsed && (
+                <div className="sidebarFooter">
+                    <Select
+                        label="Выберите ИП"
+                        placeholder="Выбрать ИП"
+                        data={organizationList.map((org) => ({
+                            value: String(org.id),
+                            label: org.organizationName,
+                        }))}
+                        value={selectedIP}
+                        onChange={handleSelectChange}
+                        withAlignedLabels
+                        checkIconPosition="right"
+                        radius="md"
+                        size="sm"
+                        styles={{
+                            input: { fontSize: 16 },
+                            label: { fontSize: 16, marginBottom: 10 },
+                            item: { fontSize: 16 },
+                        }}
+                    />
+                </div>
+            )}
         </aside>
     );
 };

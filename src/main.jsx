@@ -8,7 +8,10 @@ import './index.scss';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import { Provider } from 'react-redux';
-import { persistor, store } from './store';
+import '@mantine/dates/styles.css';
+import 'dayjs/locale/ru';
+
+import { store } from './store';
 
 const theme = createTheme({
     primaryColor: 'blue',

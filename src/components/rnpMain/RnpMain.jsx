@@ -10,6 +10,7 @@ import {
 import { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
+import './style.scss';
 
 const RnpMain = () => {
     const [showStats, setShowStats] = useState(false);
@@ -32,7 +33,6 @@ const RnpMain = () => {
             title: 'Остатки',
             rows: [{ label: 'Остаток на складах', key: 'stock_count' }],
         },
-
         {
             title: 'Конверсии',
             rows: [
@@ -67,21 +67,19 @@ const RnpMain = () => {
         }
     }, [rnpStatistic]);
 
-    const allRows = tables.flatMap((table) => table.rows);
-
-    console.log(statistic, 'statistic');
     return (
         <Paper
+            className="rnpTablePaper"
             sx={{
-                width: showStats ? '100%' : '25%',
+                width: '100%',
                 overflowX: 'auto',
             }}
         >
-            <TableContainer sx={{ minWidth: 1200 }}>
+            <TableContainer className="rnpTableContainer">
                 <Table stickyHeader>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Дата</TableCell>
+                            <TableCell className="stickyColumn stickyHeader">Дата</TableCell>
                             {showStats &&
                                 statistic.map((data, i) => (
                                     <TableCell key={i} align="center">
@@ -93,18 +91,31 @@ const RnpMain = () => {
                     <TableBody>
                         {tables.map((table, tIndex) => (
                             <Fragment key={tIndex}>
-                                <TableRow>
+                                <TableRow className="categoryRow">
                                     <TableCell
-                                        colSpan={showStats ? statistic.length + 1 : 1}
+                                        className="stickyColumn categoryHeader"
                                         sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}
                                     >
                                         {table.title}
                                     </TableCell>
+                                    {showStats &&
+                                        statistic.map((data, i) => (
+                                            <TableCell
+                                                key={i}
+                                                sx={{
+                                                    fontWeight: 'bold',
+                                                    backgroundColor: '#f5f5f5',
+                                                }}
+                                            />
+                                        ))}
                                 </TableRow>
 
                                 {table.rows.map((row) => (
                                     <TableRow key={row.key}>
-                                        <TableCell sx={{ fontWeight: 'bold', width: 250 }}>
+                                        <TableCell
+                                            className="stickyColumn"
+                                            sx={{ fontWeight: 'bold' }}
+                                        >
                                             {row.label}
                                         </TableCell>
                                         {showStats &&

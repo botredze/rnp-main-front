@@ -1,0 +1,82 @@
+.rnpTablePaper {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
+.rnpTableContainer {
+  min-width: 1200px;
+  overflow: auto;
+
+  // Закрепленная первая колонка
+  .stickyColumn {
+    position: sticky !important;
+    left: 0;
+    z-index: 3;
+    background-color: #fff;
+    min-width: 250px;
+    max-width: 250px;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+
+    &.stickyHeader {
+      z-index: 5;
+      background-color: #fff;
+      font-weight: 600;
+    }
+
+    &.categoryHeader {
+      z-index: 4;
+      background-color: #f5f5f5 !important;
+      font-weight: bold;
+    }
+  }
+
+  // Строки категорий (заголовки секций)
+  .categoryRow {
+    td {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      border-bottom: 2px solid #e0e0e0;
+
+      &:not(.stickyColumn) {
+        // Пустые ячейки в строке категории
+        min-width: 120px;
+      }
+    }
+  }
+
+  // Стили для заголовков таблицы
+  thead tr th {
+    background-color: #fff;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 12px 16px;
+
+    &:not(.stickyColumn) {
+      min-width: 120px;
+    }
+  }
+
+  // Стили для ячеек
+  tbody tr td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:not(.stickyColumn) {
+      min-width: 120px;
+    }
+  }
+
+  // Hover эффект для строк
+  tbody tr {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f9f9f9;
+
+      .stickyColumn {
+        background-color: #f9f9f9;
+      }
+    }
+  }
+}

@@ -4,14 +4,16 @@ import RnpMain from '../../components/rnpMain/RnpMain.jsx';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import RnpCharts from '../../components/rnpCharts/RnpCharts.jsx';
 import { useEffect, useState } from 'react';
-import { DatePickerInput } from '@mantine/dates';
+// import { DatePickerInput } from '@mantine/dates';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductRnpStatistic } from '../../store/reducers/productsSlice.js';
+import { DatePickerInput, DateTimePicker } from '@mantine/dates';
 
 const MainPage = () => {
     const [selectedTimePeriod, setSelectedTimePeriod] = useState('week');
     const [customRange, setCustomRange] = useState([null, null]);
     const [shovPeriodSelector, setShovPeriodSelector] = useState(false);
+    const [showCustomPicker, setShowCustomPicker] = useState(false);
 
     const { selectedProduct } = useSelector((state) => state.products);
 
@@ -49,7 +51,13 @@ const MainPage = () => {
 
     const setSelectedTimePeriodFunc = (timePeriod) => {
         setSelectedTimePeriod(timePeriod);
-        setShovPeriodSelector(false);
+
+        if (timePeriod === 'custom') {
+            setShowCustomPicker(true);
+        } else {
+            setShowCustomPicker(false);
+            setShovPeriodSelector(false);
+        }
     };
 
     useEffect(() => {

@@ -11,13 +11,35 @@ import FinanceReportPage from '../pages/FinanceReportPage/FinanceReportPage.jsx'
 
 const PrivateRoute = ({ children }) => {
     const token = useSelector((state) => state.auth.token);
-    return token ? children : <Navigate to="/login" replace />;
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
+};
+
+const PublicRoute = ({ children }) => {
+    const token = useSelector((state) => state.auth.token);
+
+    if (token) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
 };
 
 const MainRouter = () => {
     return (
         <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route
+                path="/login"
+                element={
+                    <PublicRoute>
+                        <LoginPage />
+                    </PublicRoute>
+                }
+            />
 
             <Route element={<MainLayouts />}>
                 <Route
