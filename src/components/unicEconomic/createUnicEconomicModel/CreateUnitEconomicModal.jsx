@@ -75,7 +75,6 @@ const CreateUnitEconomicModal = () => {
                     disabledInput: false,
                     disabledView: false,
                 },
-
                 {
                     label: 'Характеристика товара',
                     percent: null,
@@ -85,7 +84,6 @@ const CreateUnitEconomicModal = () => {
                     disabledInput: false,
                     disabledView: true,
                 },
-
                 {
                     label: ' - Ширина товара',
                     percent: null,
@@ -136,7 +134,6 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: true,
                 },
-
                 {
                     label: ' - Стоимость логистики доп литров',
                     percent: null,
@@ -147,7 +144,6 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: true,
                 },
-
                 {
                     label: 'Логистика c учетом % выкупа',
                     percent: null,
@@ -157,7 +153,6 @@ const CreateUnitEconomicModal = () => {
                     disabledInput: true,
                     disabledView: false,
                 },
-
                 {
                     label: ' - Цена доставки за первый литр',
                     percent: null,
@@ -178,7 +173,6 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: false,
                 },
-
                 {
                     label: ' - Коэффициент склада',
                     percent: 0,
@@ -189,7 +183,6 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: false,
                 },
-
                 {
                     label: ' - Доставка до клиента',
                     percent: null,
@@ -212,16 +205,15 @@ const CreateUnitEconomicModal = () => {
                 },
                 {
                     label: 'Реклама',
-                    percent: 10,
+                    percent: 0,
                     value: 0,
-                    symbol: '%',
+                    symbol: '₽',
                     activeLine: true,
-                    disabledInput: false,
+                    disabledInput: true,
                     disabledView: false,
                 },
-
                 {
-                    label: ' - ДРР в бюджете на единицу товара от "цены продавца',
+                    label: ' - ДРР в бюджете на единицу товара от "цены продавца"',
                     percent: 0,
                     value: null,
                     symbol: '%',
@@ -230,7 +222,6 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: false,
                 },
-
                 {
                     label: ' - Процент брака или потерь',
                     percent: 0,
@@ -241,14 +232,13 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: true,
                 },
-
                 {
                     label: ' - Брак и потери',
                     percent: null,
                     value: 0,
                     symbol: '₽',
                     activeLine: false,
-                    disabledInput: false,
+                    disabledInput: true,
                     disabledView: false,
                     seconder: true,
                 },
@@ -261,7 +251,6 @@ const CreateUnitEconomicModal = () => {
                     disabledInput: false,
                     disabledView: true,
                 },
-
                 {
                     label: ' - Коэффициент храненеи на складе',
                     percent: 0,
@@ -303,7 +292,7 @@ const CreateUnitEconomicModal = () => {
                     seconder: false,
                 },
                 {
-                    label: ' - Цена за хранение в месяц',
+                    label: ' - Цена за хранение за день',
                     percent: null,
                     value: 0,
                     symbol: '₽',
@@ -312,7 +301,16 @@ const CreateUnitEconomicModal = () => {
                     disabledView: false,
                     seconder: true,
                 },
-
+                {
+                    label: ' - Цена за хранение в период',
+                    percent: null,
+                    value: 0,
+                    symbol: '₽',
+                    activeLine: false,
+                    disabledInput: true,
+                    disabledView: false,
+                    seconder: true,
+                },
                 {
                     label: 'Доход от продажи',
                     percent: null,
@@ -372,25 +370,12 @@ const CreateUnitEconomicModal = () => {
     });
 
     const handleChange = (index, field, value) => {
-        // Клонируем таблицу
         const updatedTable = [...form.values.tableData];
+        updatedTable[index] = { ...updatedTable[index], [field]: value };
 
-        // Обновляем нужное поле строки
-        updatedTable[index] = {
-            ...updatedTable[index],
-            [field]: value,
-        };
-
-        // Формируем новые значения формы
-        const updatedValues = {
-            ...form.values,
-            tableData: updatedTable,
-        };
-
-        // Пока просто сохраняем без пересчётов
+        const updatedValues = { ...form.values, tableData: updatedTable };
         const newTable = calculateUnitEconomic(updatedValues);
 
-        // Обновляем состояние формы
         form.setFieldValue('tableData', newTable.tableData);
     };
 
@@ -404,12 +389,26 @@ const CreateUnitEconomicModal = () => {
     };
 
     const close = () => {
+        form.reset();
         dispatch(openCloseDetails(false));
+    };
+
+    // Обработчик отправки формы только по кнопке
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Предотвращаем отправку по Enter
+    };
+
+    // Обработчик клика на кнопку "Сохранить"
+    const handleSaveClick = () => {
+        form.validate();
+        if (form.isValid()) {
+            save(form.values);
+        }
     };
 
     return (
         <Modal opened={openDetailsState} onClose={close} title="Создание товара" size="55%">
-            <form onSubmit={form.onSubmit(save)}>
+            <form onSubmit={handleSubmit}>
                 <div className="container">
                     <div className="mainDataContent">
                         <TextInput
@@ -420,6 +419,7 @@ const CreateUnitEconomicModal = () => {
                             placeholder="Введите название"
                             style={{ width: 450 }}
                             {...form.getInputProps('productName')}
+                            onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                         />
                         <TextInput
                             radius="md"
@@ -429,6 +429,7 @@ const CreateUnitEconomicModal = () => {
                             placeholder="Введите артикул"
                             style={{ width: 400 }}
                             {...form.getInputProps('vendorCode')}
+                            onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                         />
                         <NumberInput
                             radius="md"
@@ -438,13 +439,14 @@ const CreateUnitEconomicModal = () => {
                             placeholder="Введите цену"
                             style={{ width: 300 }}
                             {...form.getInputProps('price')}
+                            onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                         />
-
                         <NumberInput
                             radius="md"
                             variant="filled"
                             label="Процент СПП"
                             {...form.getInputProps('ssp')}
+                            onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                         />
                     </div>
                     <div className="main-table">
@@ -453,7 +455,6 @@ const CreateUnitEconomicModal = () => {
                                 <Table.Tr>
                                     <Table.Th style={{ width: '300px' }}>Показатель</Table.Th>
                                     <Table.Th style={{ width: '150px' }}>Значение</Table.Th>
-
                                     <Table.Th style={{ width: '200px' }}>Результат</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
@@ -464,14 +465,12 @@ const CreateUnitEconomicModal = () => {
                                         key={index}
                                         className={`highlight-row ${row.activeLine ? 'cell-highlight-text' : ''}`}
                                     >
-                                        <Table.Td
-                                            className={`${row.seconder ? 'seconder-item' : ''}`}
-                                        >
+                                        <Table.Td className={row.seconder ? 'seconder-item' : ''}>
                                             {row.label}
                                         </Table.Td>
                                         <Table.Td>
-                                            {!row.disabledView ? (
-                                                row.percent != null ? (
+                                            {!row.disabledView &&
+                                                (row.percent != null ? (
                                                     <NumberInput
                                                         size="xs"
                                                         radius="md"
@@ -480,6 +479,9 @@ const CreateUnitEconomicModal = () => {
                                                         value={row.percent ?? 0}
                                                         onChange={(val) =>
                                                             handleChange(index, 'percent', val)
+                                                        }
+                                                        onKeyDown={(e) =>
+                                                            e.key === 'Enter' && e.preventDefault()
                                                         }
                                                         rightSection={
                                                             <span
@@ -503,6 +505,9 @@ const CreateUnitEconomicModal = () => {
                                                         onChange={(val) =>
                                                             handleChange(index, 'value', val)
                                                         }
+                                                        onKeyDown={(e) =>
+                                                            e.key === 'Enter' && e.preventDefault()
+                                                        }
                                                         rightSection={
                                                             <span
                                                                 style={{
@@ -515,34 +520,17 @@ const CreateUnitEconomicModal = () => {
                                                         }
                                                         disabled={row.disabledInput}
                                                     />
-                                                ) : null
-                                            ) : (
-                                                ''
-                                            )}
+                                                ) : null)}
                                         </Table.Td>
 
                                         <Table.Td>
-                                            {!row.disabledView ? (
-                                                row.percent !== null ? (
-                                                    <div>
-                                                        <span>
-                                                            {row.value != null && row.value != 0
-                                                                ? row.value
-                                                                : ''}
-                                                        </span>
-                                                    </div>
-                                                ) : row.value !== null ? (
-                                                    <div>
-                                                        <span>
-                                                            {row.value != null && row.value != 0
-                                                                ? row.value
-                                                                : ''}
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <span></span>
-                                                )
-                                            ) : null}
+                                            {!row.disabledView && (
+                                                <span>
+                                                    {row.value != null && row.value !== 0
+                                                        ? row.value
+                                                        : ''}
+                                                </span>
+                                            )}
                                         </Table.Td>
                                     </Table.Tr>
                                 ))}
@@ -555,7 +543,9 @@ const CreateUnitEconomicModal = () => {
                     <Button variant="default" onClick={close}>
                         Отмена
                     </Button>
-                    <Button type="submit">Сохранить</Button>
+                    <Button type="button" onClick={handleSaveClick} loading={loading}>
+                        Сохранить
+                    </Button>
                 </Group>
             </form>
         </Modal>

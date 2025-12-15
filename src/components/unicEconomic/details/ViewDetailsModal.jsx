@@ -74,7 +74,6 @@ const ViewUnitEconomicModal = () => {
                     </div>
                 </div>
 
-                {/* === Таблица === */}
                 {tableData.length > 0 && (
                     <div className="main-table">
                         <Table
@@ -86,9 +85,8 @@ const ViewUnitEconomicModal = () => {
                             <Table.Thead>
                                 <Table.Tr className="highlight-row">
                                     <Table.Th style={{ width: '250px' }}>Показатель</Table.Th>
-                                    <Table.Th style={{ width: '90px' }}>%</Table.Th>
-                                    <Table.Th style={{ width: '100px' }}>Значение</Table.Th>
-                                    <Table.Th style={{ width: '100px' }}>Процент от цены</Table.Th>
+                                    <Table.Th style={{ width: '90px' }}>Процент/Значение</Table.Th>
+                                    <Table.Th style={{ width: '100px' }}>Итого</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
 
@@ -111,10 +109,6 @@ const ViewUnitEconomicModal = () => {
                                             row.value !== undefined
                                                 ? `${row.value} ₽`
                                                 : ''}
-                                        </Table.Td>
-
-                                        <Table.Td>
-                                            {row.percentOfPrice ? `${row.percentOfPrice}%` : ''}
                                         </Table.Td>
                                     </Table.Tr>
                                 ))}

@@ -12,6 +12,7 @@ axiosInstance.interceptors.request.use(
     (config) => {
         try {
             const raw = localStorage.getItem('persist:auth');
+            console.log(raw, 'raw');
             if (raw) {
                 const parsed = JSON.parse(raw);
                 const auth = {
