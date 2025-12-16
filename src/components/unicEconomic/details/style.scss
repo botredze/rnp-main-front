@@ -69,3 +69,58 @@ span {
     font-weight: 500;
   }
 }
+
+
+
+
+/* Активная строка - выделение синим */
+.active-line-row {
+  background-color: #e7f5ff !important;
+}
+
+.active-line-row:hover {
+  background-color: #d0ebff !important;
+}
+
+/* Вложенные элементы (с отступом) */
+.seconder-item {
+  padding-left: 24px !important;
+  font-size: 14px;
+  color: #495057;
+}
+
+/* Таблица для просмотра */
+.unit-details-table .active-line-row td {
+  font-weight: 500;
+  background-color: #e7f5ff;
+}
+
+/* Стили для заголовков */
+.unit-table thead tr th,
+.unit-details-table thead tr th {
+  background-color: #228be6;
+  color: white;
+  font-weight: 600;
+}
+
+/* Полосатая таблица */
+.unit-details-table tbody tr:nth-of-type(odd):not(.active-line-row) {
+  background-color: #f8f9fa;
+}
+
+/* Hover эффект */
+.unit-table tbody tr:hover:not(.active-line-row),
+.unit-details-table tbody tr:hover:not(.active-line-row) {
+  background-color: #f1f3f5;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .mainDataContent {
+    flex-direction: column;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}

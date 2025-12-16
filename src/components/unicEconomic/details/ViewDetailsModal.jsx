@@ -1,6 +1,11 @@
 import { Modal, Group, Button, Table, Text } from '@mantine/core';
 import { useSelector, useDispatch } from 'react-redux';
-import { setOpenCloseCreateState } from '../../../store/reducers/unitEconomicSlice.js';
+import {
+    setOpenCloseCreateState,
+    openCloseDetails,
+    setSelectedUnitItem,
+    setIsEditItem,
+} from '../../../store/reducers/unitEconomicSlice.js';
 import './style.scss';
 
 const ViewUnitEconomicModal = () => {
@@ -8,6 +13,13 @@ const ViewUnitEconomicModal = () => {
     const { openCloseCreateState, selectedItem } = useSelector((state) => state.unitEconomic);
 
     const close = () => dispatch(setOpenCloseCreateState(false));
+
+    const handleEdit = () => {
+        dispatch(setSelectedUnitItem(selectedItem));
+        dispatch(setIsEditItem(true));
+        dispatch(setOpenCloseCreateState(false));
+        dispatch(openCloseDetails(true));
+    };
 
     if (!selectedItem) return null;
 
@@ -40,11 +52,9 @@ const ViewUnitEconomicModal = () => {
                         <Text size="sm">
                             <strong>Артикул на ВБ:</strong> {selectedItem.vendorCode}
                         </Text>
-
                         <Text size="sm">
-                            <strong>Себестоимость:</strong> {getValue('Себестоимость итого')} ₽
+                            <strong>Себестоимость:</strong> {selectedItem.price} ₽
                         </Text>
-
                         <Text size="sm">
                             <strong>Цена продажи (до СПП):</strong> {getValue('Цена на WB наша')} ₽
                         </Text>
@@ -54,20 +64,16 @@ const ViewUnitEconomicModal = () => {
                         <Text size="sm">
                             <strong>СПП:</strong> {selectedItem.ssp} %
                         </Text>
-
                         <Text size="sm">
                             <strong>Цена с СПП:</strong> {getValue('Цена с СПП')} ₽
                         </Text>
-
                         <Text size="sm">
                             <strong>Цена к перечислению от WB:</strong>{' '}
                             {getValue('К перечислению от WB')} ₽
                         </Text>
-
                         <Text size="sm">
                             <strong>ROI:</strong> {getPercent('ROI за единицу')} %
                         </Text>
-
                         <Text size="sm">
                             <strong>Маржинальность:</strong> {getPercent('Маржинальность')} %
                         </Text>
@@ -83,7 +89,7 @@ const ViewUnitEconomicModal = () => {
                             className="unit-details-table"
                         >
                             <Table.Thead>
-                                <Table.Tr className="highlight-row">
+                                <Table.Tr>
                                     <Table.Th style={{ width: '250px' }}>Показатель</Table.Th>
                                     <Table.Th style={{ width: '90px' }}>Процент/Значение</Table.Th>
                                     <Table.Th style={{ width: '100px' }}>Итого</Table.Th>
@@ -92,22 +98,28 @@ const ViewUnitEconomicModal = () => {
 
                             <Table.Tbody>
                                 {tableData.map((row, index) => (
-                                    <Table.Tr key={index}>
-                                        <Table.Td>{row.label}</Table.Td>
+                                    <Table.Tr
+                                        key={index}
+                                        className={row.activeLine ? 'active-line-row' : ''}
+                                    >
+                                        <Table.Td className={row.seconder ? 'seconder-item' : ''}>
+                                            {row.label}
+                                        </Table.Td>
 
                                         <Table.Td>
                                             {row.percent !== '' &&
                                             row.percent !== null &&
                                             row.percent !== undefined
-                                                ? `${row.percent} %`
+                                                ? `${row.percent} ${row?.symbol}`
                                                 : ''}
                                         </Table.Td>
 
                                         <Table.Td>
                                             {row.value !== '' &&
                                             row.value !== null &&
-                                            row.value !== undefined
-                                                ? `${row.value} ₽`
+                                            row.value !== undefined &&
+                                            row.value !== 0
+                                                ? `${row.value} ${row?.symbol}`
                                                 : ''}
                                         </Table.Td>
                                     </Table.Tr>
@@ -120,8 +132,8 @@ const ViewUnitEconomicModal = () => {
 
             {/* === Кнопки === */}
             <Group justify="space-between" mt="xl">
-                <Button color="blue" onClick={() => console.log('Редактировать')}>
-                    Изменить
+                <Button color="blue" onClick={handleEdit}>
+                    Редактировать
                 </Button>
 
                 <Button variant="default" onClick={close}>

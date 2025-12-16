@@ -13,6 +13,8 @@ const initialState = {
     items: [],
     openDetailsState: false,
     openCloseCreateState: false,
+    isEdit: false,
+    selectedUnitItem: null,
 };
 
 export const getProductListByOrganization = createAsyncThunk(
@@ -66,6 +68,25 @@ export const createProductByOrganization = createAsyncThunk(
     }
 );
 
+export const updateProductByOrganization = createAsyncThunk(
+    'unitEconomic/updateProductByOrganization',
+    async (formData, { rejectWithValue }) => {
+        // try {
+        //     const response = await axiosInstance.post(`/unit-economic/create`, formData);
+        //
+        //     if (response.status === 201) {
+        //         return response.data;
+        //     } else {
+        //         return rejectWithValue('Ошибка сервера: ' + response.status);
+        //     }
+        // } catch (error) {
+        //     return rejectWithValue(error.response?.data || error.message);
+        // }
+
+        console.log(formData, 'formData');
+    }
+);
+
 const unitEconomicSlice = createSlice({
     name: 'unitEconomicSlice',
     initialState,
@@ -80,6 +101,14 @@ const unitEconomicSlice = createSlice({
 
         setSelectedItemId: (state, action) => {
             state.selectedItemId = action.payload;
+        },
+
+        setSelectedUnitItem: (state, action) => {
+            state.selectedUnitItem = action.payload;
+        },
+
+        setIsEditItem: (state, action) => {
+            state.isEdit = action.payload;
         },
     },
 
@@ -126,6 +155,11 @@ const unitEconomicSlice = createSlice({
             });
     },
 });
-export const { openCloseDetails, setSelectedItemId, setOpenCloseCreateState } =
-    unitEconomicSlice.actions;
+export const {
+    openCloseDetails,
+    setSelectedItemId,
+    setOpenCloseCreateState,
+    setSelectedUnitItem,
+    setIsEditItem,
+} = unitEconomicSlice.actions;
 export default unitEconomicSlice.reducer;

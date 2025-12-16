@@ -1,15 +1,366 @@
 import { Modal, Group, Button, TextInput, NumberInput, Table } from '@mantine/core';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from '@mantine/form';
+import { useEffect } from 'react';
 import './style.scss';
 import {
     createProductByOrganization,
+    updateProductByOrganization,
     getProductListByOrganization,
     openCloseDetails,
+    setSelectedUnitItem,
+    setIsEditItem,
 } from '../../../store/reducers/unitEconomicSlice.js';
 import { calculateUnitEconomic } from './calculator.js';
 
-const CreateUnitEconomicModal = () => {
+const getInitialTableData = () => [
+    {
+        label: 'Цена на WB наша',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+    },
+    {
+        label: 'Цена с СПП',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'Комиссия WB',
+        percent: 37.5,
+        value: 0,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+    },
+    {
+        label: 'Доп.комиссия',
+        percent: 2,
+        value: 0,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+    },
+    {
+        label: 'Эквайринг',
+        percent: 1.5,
+        value: 0,
+        symbol: '%',
+        activeLine: true,
+        disabledInput: false,
+        disabledView: false,
+    },
+    {
+        label: 'Процент выкупа',
+        percent: 42,
+        value: null,
+        symbol: '%',
+        activeLine: true,
+        disabledInput: false,
+        disabledView: false,
+    },
+    {
+        label: 'Характеристика товара',
+        percent: null,
+        value: 0,
+        symbol: 'см',
+        activeLine: true,
+        disabledInput: false,
+        disabledView: true,
+    },
+    {
+        label: ' - Ширина товара',
+        percent: null,
+        value: 0,
+        symbol: 'см',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Длина товара',
+        percent: null,
+        value: 0,
+        symbol: 'см',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Высота товара',
+        percent: null,
+        value: 0,
+        symbol: 'см',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Обьем товара в литрах',
+        percent: null,
+        value: 0,
+        symbol: 'л',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Обьем доп литров',
+        percent: null,
+        value: 0,
+        symbol: 'л',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Стоимость логистики доп литров',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: 'Логистика c учетом % выкупа',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: ' - Цена доставки за первый литр',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Цена доставки за доп. литр',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Коэффициент склада',
+        percent: 0,
+        value: null,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Доставка до клиента',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Возврат от клиента',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: 'Реклама',
+        percent: 0,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: ' - ДРР в бюджете на единицу товара от "цены продавца"',
+        percent: 0,
+        value: null,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Процент брака или потерь',
+        percent: 0,
+        value: null,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Брак и потери',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: 'Хранение',
+        percent: 3,
+        value: 0,
+        symbol: '%',
+        activeLine: true,
+        disabledInput: false,
+        disabledView: true,
+    },
+    {
+        label: ' - Коэффициент храненеи на складе',
+        percent: 0,
+        value: 0,
+        symbol: '%',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Цена хранения за первый литр',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Цена хранения за доп литры',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Предпологаемый срок хранения',
+        percent: null,
+        value: 0,
+        symbol: 'дн',
+        activeLine: false,
+        disabledInput: false,
+        disabledView: false,
+        seconder: false,
+    },
+    {
+        label: ' - Цена за хранение за день',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: ' - Цена за хранение в период',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: false,
+        disabledInput: true,
+        disabledView: false,
+        seconder: true,
+    },
+    {
+        label: 'Доход от продажи',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'К перечислению от WB',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'Рассходы на еденицу',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'Валовая прибыль',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'Маржинальность',
+        percent: 0,
+        value: null,
+        symbol: '%',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+    {
+        label: 'ROI за единицу',
+        percent: 0,
+        value: null,
+        symbol: '%',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+    },
+];
+
+const CreateEditUnitEconomicModal = ({ editMode = false, editData = null }) => {
     const dispatch = useDispatch();
     const { openDetailsState, error, loading } = useSelector((state) => state.unitEconomic);
     const { organization } = useSelector((state) => state.organization);
@@ -20,354 +371,24 @@ const CreateUnitEconomicModal = () => {
             vendorCode: '',
             price: '',
             ssp: 38,
-            tableData: [
-                {
-                    label: 'Цена на WB наша',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                },
-                {
-                    label: 'Цена с СПП',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'Комиссия WB',
-                    percent: 37.5,
-                    value: 0,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                },
-                {
-                    label: 'Доп.комиссия',
-                    percent: 2,
-                    value: 0,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                },
-                {
-                    label: 'Эквайринг',
-                    percent: 1.5,
-                    value: 0,
-                    symbol: '%',
-                    activeLine: true,
-                    disabledInput: false,
-                    disabledView: false,
-                },
-                {
-                    label: 'Процент выкупа',
-                    percent: 42,
-                    value: null,
-                    symbol: '%',
-                    activeLine: true,
-                    disabledInput: false,
-                    disabledView: false,
-                },
-                {
-                    label: 'Характеристика товара',
-                    percent: null,
-                    value: 0,
-                    symbol: 'см',
-                    activeLine: true,
-                    disabledInput: false,
-                    disabledView: true,
-                },
-                {
-                    label: ' - Ширина товара',
-                    percent: null,
-                    value: 0,
-                    symbol: 'см',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Длина товара',
-                    percent: null,
-                    value: 0,
-                    symbol: 'см',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Высота товара',
-                    percent: null,
-                    value: 0,
-                    symbol: 'см',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Обьем товара в литрах',
-                    percent: null,
-                    value: 0,
-                    symbol: 'л',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Обьем доп литров',
-                    percent: null,
-                    value: 0,
-                    symbol: 'л',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Стоимость логистики доп литров',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: 'Логистика c учетом % выкупа',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: ' - Цена доставки за первый литр',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Цена доставки за доп. литр',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Коэффициент склада',
-                    percent: 0,
-                    value: null,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Доставка до клиента',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Возврат от клиента',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: 'Реклама',
-                    percent: 0,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: ' - ДРР в бюджете на единицу товара от "цены продавца"',
-                    percent: 0,
-                    value: null,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Процент брака или потерь',
-                    percent: 0,
-                    value: null,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Брак и потери',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: 'Хранение',
-                    percent: 3,
-                    value: 0,
-                    symbol: '%',
-                    activeLine: true,
-                    disabledInput: false,
-                    disabledView: true,
-                },
-                {
-                    label: ' - Коэффициент храненеи на складе',
-                    percent: 0,
-                    value: 0,
-                    symbol: '%',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Цена хранения за первый литр',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Цена хранения за доп литры',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Предпологаемый срок хранения',
-                    percent: null,
-                    value: 0,
-                    symbol: 'дн',
-                    activeLine: false,
-                    disabledInput: false,
-                    disabledView: false,
-                    seconder: false,
-                },
-                {
-                    label: ' - Цена за хранение за день',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: ' - Цена за хранение в период',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: false,
-                    disabledInput: true,
-                    disabledView: false,
-                    seconder: true,
-                },
-                {
-                    label: 'Доход от продажи',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'К перечислению от WB',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'Рассходы на еденицу',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'Валовая прибыль',
-                    percent: null,
-                    value: 0,
-                    symbol: '₽',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'Маржинальность',
-                    percent: 0,
-                    value: null,
-                    symbol: '%',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-                {
-                    label: 'ROI за единицу',
-                    percent: 0,
-                    value: null,
-                    symbol: '%',
-                    activeLine: true,
-                    disabledInput: true,
-                    disabledView: false,
-                },
-            ],
+            tableData: getInitialTableData(),
         },
     });
+
+    // Загрузка данных при редактировании
+    useEffect(() => {
+        if (editMode && editData) {
+            form.setValues({
+                productName: editData.productName || '',
+                vendorCode: editData.vendorCode || '',
+                price: editData.price || '',
+                ssp: editData.ssp || 38,
+                tableData: editData.tableData || getInitialTableData(),
+            });
+        } else {
+            form.reset();
+        }
+    }, [editMode, editData, openDetailsState]);
 
     const handleChange = (index, field, value) => {
         const updatedTable = [...form.values.tableData];
@@ -381,7 +402,15 @@ const CreateUnitEconomicModal = () => {
 
     const save = (values) => {
         values.organizationId = organization.id;
-        dispatch(createProductByOrganization(values));
+
+        if (editMode && editData?.id) {
+            // Обновление
+            dispatch(updateProductByOrganization({ id: editData.id, ...values }));
+        } else {
+            // Создание
+            dispatch(createProductByOrganization(values));
+        }
+
         if (!error) {
             dispatch(getProductListByOrganization({ organizationId: organization.id }));
             close();
@@ -391,14 +420,14 @@ const CreateUnitEconomicModal = () => {
     const close = () => {
         form.reset();
         dispatch(openCloseDetails(false));
+        dispatch(setSelectedUnitItem(null));
+        dispatch(setIsEditItem(false));
     };
 
-    // Обработчик отправки формы только по кнопке
     const handleSubmit = (e) => {
-        e.preventDefault(); // Предотвращаем отправку по Enter
+        e.preventDefault();
     };
 
-    // Обработчик клика на кнопку "Сохранить"
     const handleSaveClick = () => {
         form.validate();
         if (form.isValid()) {
@@ -407,7 +436,12 @@ const CreateUnitEconomicModal = () => {
     };
 
     return (
-        <Modal opened={openDetailsState} onClose={close} title="Создание товара" size="55%">
+        <Modal
+            opened={openDetailsState}
+            onClose={close}
+            title={editMode ? 'Редактирование товара' : 'Создание товара'}
+            size="55%"
+        >
             <form onSubmit={handleSubmit}>
                 <div className="container">
                     <div className="mainDataContent">
@@ -463,7 +497,7 @@ const CreateUnitEconomicModal = () => {
                                 {form.values.tableData.map((row, index) => (
                                     <Table.Tr
                                         key={index}
-                                        className={`highlight-row ${row.activeLine ? 'cell-highlight-text' : ''}`}
+                                        className={row.activeLine ? 'active-line-row' : ''}
                                     >
                                         <Table.Td className={row.seconder ? 'seconder-item' : ''}>
                                             {row.label}
@@ -544,7 +578,7 @@ const CreateUnitEconomicModal = () => {
                         Отмена
                     </Button>
                     <Button type="button" onClick={handleSaveClick} loading={loading}>
-                        Сохранить
+                        {editMode ? 'Обновить' : 'Сохранить'}
                     </Button>
                 </Group>
             </form>
@@ -552,4 +586,4 @@ const CreateUnitEconomicModal = () => {
     );
 };
 
-export default CreateUnitEconomicModal;
+export default CreateEditUnitEconomicModal;

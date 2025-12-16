@@ -7,14 +7,13 @@ import {
     getProductListByOrganization,
     openCloseDetails,
     setOpenCloseCreateState,
-    setSelectedItemId,
 } from '../../store/reducers/unitEconomicSlice.js';
 import { useEffect } from 'react';
 import ViewUnitEconomicModal from '../../components/unicEconomic/details/ViewDetailsModal.jsx';
 
 const UnitEconomicPage = () => {
     const { organization } = useSelector((state) => state.organization);
-    const { items } = useSelector((state) => state.unitEconomic);
+    const { items, isEdit, selectedUnitItem } = useSelector((state) => state.unitEconomic);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -96,7 +95,7 @@ const UnitEconomicPage = () => {
                 </Table>
             </div>
 
-            <CreateUnitEconomicModal />
+            <CreateUnitEconomicModal editMode={isEdit} editData={selectedUnitItem} />
             <ViewUnitEconomicModal />
         </div>
     );
