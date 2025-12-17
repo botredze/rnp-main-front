@@ -8,7 +8,6 @@
   min-width: 600px;
   overflow: auto;
 
-  // Закрепленная первая колонка
   .stickyColumn {
     position: sticky !important;
     left: 0;
@@ -79,4 +78,44 @@
       }
     }
   }
+}
+
+.rnpTablePaper {
+  .rnpTableContainer {
+
+    .stickyColumn {
+      position: sticky;
+      left: 0;
+      background-color: white;
+      z-index: 10;
+
+      &.stickyHeader {
+        z-index: 100;
+      }
+
+      &.categoryHeader {
+        z-index: 11;
+      }
+    }
+
+    .categoryRow {
+      .categoryHeader {
+        border-bottom: 2px solid #e0e0e0;
+      }
+    }
+
+    .MuiTableCell-root {
+      position: relative;
+    }
+  }
+}
+
+.contentValue{
+  margin-top: 15px;
+  font-size: 15px;
+}
+
+.percentValue{
+  font-size: 13px;
+  font-weight: 600;
 }

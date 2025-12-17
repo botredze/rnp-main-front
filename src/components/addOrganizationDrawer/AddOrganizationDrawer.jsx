@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Drawer, TextInput, Button, Group } from '@mantine/core';
+import { Drawer, TextInput, Button, Group, Alert } from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     setOpenCreateOrganizationState,
@@ -72,7 +73,7 @@ const AddOrganizationDrawer = () => {
                     apiKey,
                 };
 
-                if (selectedUser.role === 'admin' && selectedUser.id != 0) {
+                if (selectedUser?.role === 'admin' && selectedUser?.id != 0) {
                     payload.userId = selectedUser.id;
                 }
 
@@ -97,6 +98,19 @@ const AddOrganizationDrawer = () => {
             size="35%"
             position="right"
         >
+            {!isEdit && (
+                <Alert
+                    icon={<IconInfoCircle size={16} />}
+                    title="Подсказка"
+                    color="blue"
+                    variant="light"
+                    mb="md"
+                >
+                    Не знаете где взять API-ключ? Нажмите кнопку "Как получить API-ключ?" на главной
+                    странице
+                </Alert>
+            )}
+
             <TextInput
                 label="Название организации"
                 placeholder="Введите название организации"
@@ -104,15 +118,17 @@ const AddOrganizationDrawer = () => {
                 onChange={(e) => setOrganizationName(e.currentTarget.value)}
                 error={errors.organizationName}
                 mb="sm"
+                required
             />
 
             <TextInput
                 label="API ключ"
-                placeholder="Введите API ключ"
+                placeholder="Введите API ключ от Wildberries"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.currentTarget.value)}
                 error={errors.apiKey}
                 mb="sm"
+                required
             />
 
             <Group justify="center" mt="md">

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import MainPage from '../pages/mainPage/MainPage.jsx';
 import LoginPage from '../pages/loginPage/LoginPage.jsx';
 import UnitEconomicPage from '../pages/unitEconomic/UnitEconomicPage.jsx';
 import MainLayouts from '../components/layouts/MainLayouts.jsx';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SettingsPage from '../pages/settingsPage/SettingsPage.jsx';
 import AdminPanel from '../pages/adminPanel/AdminPanel.jsx';
 import FinanceReportPage from '../pages/FinanceReportPage/FinanceReportPage.jsx';
+import HelloPage from '../pages/helloPage/HelloPage.jsx';
+import { getOrganizationList } from '../store/reducers/organizationSlice.js';
 
 const PrivateRoute = ({ children }) => {
     const token = useSelector((state) => state.auth.token);
@@ -29,7 +31,41 @@ const PublicRoute = ({ children }) => {
     return children;
 };
 
+const OrganizationGuard = ({ children }) => {
+    const { organizationList } = useSelector((state) => state.organization);
+
+    console.log(organizationList, 'organizationList');
+    const hasActiveOrganization = organizationList?.some((org) => org.status === 'active');
+
+    console.log(hasActiveOrganization, 'hasActiveOrganization');
+    if (!hasActiveOrganization) {
+        return <Navigate to="/hello" replace />;
+    }
+
+    return children;
+};
+
+const NoOrganizationOnly = ({ children }) => {
+    const { organizationList, isLoading } = useSelector((state) => state.organization);
+
+    if (isLoading) return null;
+
+    const hasActiveOrganization = organizationList.some((org) => org.status === 'active');
+
+    if (hasActiveOrganization) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
+};
+
 const MainRouter = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getOrganizationList());
+    }, [dispatch]);
+
     return (
         <Routes>
             <Route
@@ -43,10 +79,24 @@ const MainRouter = () => {
 
             <Route element={<MainLayouts />}>
                 <Route
+                    path="/hello"
+                    element={
+                        <PrivateRoute>
+                            <NoOrganizationOnly>
+                                <HelloPage />
+                            </NoOrganizationOnly>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* Главная страница - требует активную организацию */}
+                <Route
                     path="/"
                     element={
                         <PrivateRoute>
-                            <MainPage />
+                            <OrganizationGuard>
+                                <MainPage />
+                            </OrganizationGuard>
                         </PrivateRoute>
                     }
                 />
@@ -55,7 +105,9 @@ const MainRouter = () => {
                     path="/unitEconomic"
                     element={
                         <PrivateRoute>
-                            <UnitEconomicPage />
+                            <OrganizationGuard>
+                                <UnitEconomicPage />
+                            </OrganizationGuard>
                         </PrivateRoute>
                     }
                 />
@@ -64,7 +116,9 @@ const MainRouter = () => {
                     path="/reports"
                     element={
                         <PrivateRoute>
-                            <FinanceReportPage />
+                            <OrganizationGuard>
+                                <FinanceReportPage />
+                            </OrganizationGuard>
                         </PrivateRoute>
                     }
                 />
@@ -73,7 +127,9 @@ const MainRouter = () => {
                     path="/settings"
                     element={
                         <PrivateRoute>
-                            <SettingsPage />
+                            <OrganizationGuard>
+                                <SettingsPage />
+                            </OrganizationGuard>
                         </PrivateRoute>
                     }
                 />
@@ -82,7 +138,9 @@ const MainRouter = () => {
                     path="/admin"
                     element={
                         <PrivateRoute>
-                            <AdminPanel />
+                            <OrganizationGuard>
+                                <AdminPanel />
+                            </OrganizationGuard>
                         </PrivateRoute>
                     }
                 />
