@@ -160,28 +160,41 @@ const RnpMain = () => {
                 }}
             >
                 <div className="contentValue">{value}</div>
-                {changePercent !== null && changePercent !== undefined && (
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 4,
-                            right: 4,
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontSize: 12,
-                            color: parseFloat(changePercent) >= 0 ? '#4caf50' : '#f44336',
-                        }}
-                    >
-                        {parseFloat(changePercent) >= 0 ? (
-                            <TrendingUpIcon sx={{ fontSize: 12 }} />
-                        ) : (
-                            <TrendingDownIcon sx={{ fontSize: 12 }} />
-                        )}
-                        <span className="percentValue">
-                            {Math.abs(parseFloat(changePercent).toFixed(0))}%
-                        </span>
-                    </Box>
-                )}
+
+                {changePercent !== null &&
+                    changePercent !== undefined &&
+                    (() => {
+                        const percent = Number(changePercent);
+
+                        if (Number.isNaN(percent) || percent === 0) return null;
+
+                        const isPositive = percent > 0;
+
+                        return (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    top: 4,
+                                    right: 4,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontSize: 12,
+                                    color: isPositive ? '#4caf50' : '#f44336',
+                                }}
+                            >
+                                {isPositive ? (
+                                    <TrendingUpIcon sx={{ fontSize: 12 }} />
+                                ) : (
+                                    <TrendingDownIcon sx={{ fontSize: 12 }} />
+                                )}
+
+                                <span className="percentValue">
+                                    {isPositive ? '+' : ''}
+                                    {percent.toFixed(0)}%
+                                </span>
+                            </Box>
+                        );
+                    })()}
             </Box>
         );
     };
