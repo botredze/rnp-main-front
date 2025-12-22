@@ -38,8 +38,9 @@ export const calculateUnitEconomic = (formValues) => {
     const sspIndex = getIndex('Цена с СПП');
     if (sspIndex !== -1) {
         const sspPercent = num(formValues.ssp);
-        const sspValue = remainingPrice * (sspPercent / 100);
-        const newPrice = remainingPrice + sspValue;
+
+        const sspValue = fixedRemainingPrice * (sspPercent / 100);
+        const newPrice = fixedRemainingPrice - sspValue;
         tableData[sspIndex].value = parseFloat(newPrice.toFixed(2));
         remainingPrice = newPrice;
     }
@@ -57,7 +58,8 @@ export const calculateUnitEconomic = (formValues) => {
     const acquiringIndex = getIndex('Эквайринг');
     if (acquiringIndex !== -1) {
         const percent = num(tableData[acquiringIndex].percent);
-        const deducted = remainingPrice * (percent / 100);
+        const sppValue = num(tableData[sspIndex].value);
+        const deducted = sppValue * (percent / 100);
         tableData[acquiringIndex].value = parseFloat(deducted.toFixed(1));
         remainingPrice -= deducted;
     }
@@ -105,16 +107,17 @@ export const calculateUnitEconomic = (formValues) => {
         const procVykup = num(tableData[precentVykupIndex].percent);
         const backToSell = getValue(' - Возврат от клиента');
 
+        const basePrice = num(tableData[priceForLitr].value) || 46.14;
+
         tableData[keffStock].value = parseFloat(keff.toFixed(2));
-        tableData[priceForLitr].value = 46.14;
 
         let logicticValue = 0;
 
         if (sTovar <= 1) {
-            logicticValue = 46.14 * (keff / 100);
+            logicticValue = basePrice * (keff / 100);
             tableData[logisticIndex].value = parseFloat(logicticValue.toFixed(2));
         } else {
-            const base = 46.14;
+            const base = basePrice;
             const dopLogisticCost = dopLitrs * priceDop;
 
             if (priceForLogisticBolsheLitraIndex !== -1) {
@@ -128,7 +131,7 @@ export const calculateUnitEconomic = (formValues) => {
             const logisticSumm = (logicticValue + logisticSummByPercent) / (procVykup / 100);
 
             tableData[logisticIndex].value = parseFloat(logisticSumm.toFixed(2));
-            tableData[dostavkaIndex].value = parseFloat(logicticValue.toFixed(2));
+            tableData[dostavkaIndex].value = parseFloat(logisticValue.toFixed(2));
         }
     }
 
@@ -137,7 +140,7 @@ export const calculateUnitEconomic = (formValues) => {
     const savePriceExtraIndex = getIndex(' - Цена хранения за доп литры');
     const saveDaysIndex = getIndex(' - Предпологаемый срок хранения');
     const saveMonthIndex = getIndex(' - Цена за хранение в период');
-    const saveCoeffIndex = getIndex(' - Коэффициент храненеи на складе');
+    const saveCoeffIndex = getIndex(' - Коэффициент хранения на складе');
     const daylySaveIndex = getIndex(' - Цена за хранение за день');
 
     if (
@@ -190,7 +193,7 @@ export const calculateUnitEconomic = (formValues) => {
 
     // === ОСНОВНЫЕ РАСЧЁТЫ ===
 
-    // ИСПРАВЛЕНО: Расходы на единицу = Комиссия WB + Доп.комиссия + Эквайринг + Логистика + Хранение
+    // Расходы на единицу = Комиссия WB + Доп.комиссия + Эквайринг + Логистика + Хранение + Реклама + Брак
     const expenseIndex = getIndex('Рассходы на еденицу');
 
     const wbCommission = getValue('Комиссия WB');
@@ -198,9 +201,12 @@ export const calculateUnitEconomic = (formValues) => {
     const acquiring = getValue('Эквайринг');
     const logistic = getValue('Логистика c учетом % выкупа');
     const storage = getValue(' - Цена за хранение в период');
+    const ads = getValue('Реклама');
+    const defects = getValue(' - Брак и потери');
 
-    // Итог расхода (БЕЗ себестоимости, только операционные расходы)
-    const totalExpense = wbCommission + extraCommission + acquiring + logistic + storage;
+    // Итог расхода (операционные расходы)
+    const totalExpense =
+        wbCommission + extraCommission + acquiring + logistic + storage + ads + defects;
 
     if (expenseIndex !== -1) {
         tableData[expenseIndex].value = parseFloat(totalExpense.toFixed(2));
@@ -211,8 +217,11 @@ export const calculateUnitEconomic = (formValues) => {
     const toPay = getValue('К перечислению от WB');
 
     if (grossProfitIndex !== -1) {
+        const rubRate = formValues?.rubRate || 1.11;
+
         const gross = toPay - totalExpense;
-        tableData[grossProfitIndex].value = parseFloat(gross.toFixed(2));
+        const finalGross = gross * rubRate;
+        tableData[grossProfitIndex].value = parseFloat(finalGross.toFixed(2));
     }
 
     // Маржинальность (%) = Валовая прибыль / Цена до СПП * 100
@@ -233,6 +242,7 @@ export const calculateUnitEconomic = (formValues) => {
         const gross = getValue('Валовая прибыль');
         const roi = (gross / costPrice) * 100;
         tableData[roiIndex].percent = parseFloat(roi.toFixed(2));
+        tableData[roiIndex].value = parseFloat(roi.toFixed(2));
     }
 
     return { ...formValues, tableData };

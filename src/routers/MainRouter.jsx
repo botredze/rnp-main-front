@@ -34,10 +34,8 @@ const PublicRoute = ({ children }) => {
 const OrganizationGuard = ({ children }) => {
     const { organizationList } = useSelector((state) => state.organization);
 
-    console.log(organizationList, 'organizationList');
     const hasActiveOrganization = organizationList?.some((org) => org.status === 'active');
 
-    console.log(hasActiveOrganization, 'hasActiveOrganization');
     if (!hasActiveOrganization) {
         return <Navigate to="/hello" replace />;
     }

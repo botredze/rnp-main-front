@@ -50,7 +50,7 @@ const RnpMain = () => {
             rows: [
                 {
                     label: 'Остаток на складах',
-                    key: 'stock_count',
+                    key: 'stock_total',
                     // changeKey: 'stock_count_change_percent',
                 },
             ],

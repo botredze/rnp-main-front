@@ -15,6 +15,7 @@ import './style.scss';
 import mainLogo from '../../assets/logos/mainLogo.png';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    getOrganizationBasicAnalytics,
     getOrganizationList,
     setSelectedOrganization,
 } from '../../store/reducers/organizationSlice.js';
@@ -38,12 +39,14 @@ const SideBar = () => {
             const firstOrg = organizationList[0];
             setSelectedIP(String(firstOrg.id));
             dispatch(setSelectedOrganization(firstOrg));
+            console.log(organization, 'organization');
         }
     }, [organizationList, organization.id, dispatch]);
 
     useEffect(() => {
         if (organization.id) {
             setSelectedIP(String(organization.id));
+            dispatch(getOrganizationBasicAnalytics({ organizationId: organization?.id ?? 0 }));
         }
     }, [organization.id]);
 

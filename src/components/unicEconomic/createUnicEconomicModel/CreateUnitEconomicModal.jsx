@@ -216,22 +216,22 @@ const getInitialTableData = () => [
         seconder: false,
     },
     {
+        label: ' - Брак и потери',
+        percent: null,
+        value: 0,
+        symbol: '₽',
+        activeLine: true,
+        disabledInput: true,
+        disabledView: false,
+        seconder: false,
+    },
+    {
         label: ' - Процент брака или потерь',
         percent: 0,
         value: null,
         symbol: '%',
         activeLine: false,
         disabledInput: false,
-        disabledView: false,
-        seconder: true,
-    },
-    {
-        label: ' - Брак и потери',
-        percent: null,
-        value: 0,
-        symbol: '₽',
-        activeLine: false,
-        disabledInput: true,
         disabledView: false,
         seconder: true,
     },
@@ -245,7 +245,7 @@ const getInitialTableData = () => [
         disabledView: true,
     },
     {
-        label: ' - Коэффициент храненеи на складе',
+        label: ' - Коэффициент хранения на складе',
         percent: 0,
         value: 0,
         symbol: '%',
@@ -335,7 +335,7 @@ const getInitialTableData = () => [
         label: 'Валовая прибыль',
         percent: null,
         value: 0,
-        symbol: '₽',
+        symbol: 'сом',
         activeLine: true,
         disabledInput: true,
         disabledView: false,
@@ -370,12 +370,12 @@ const CreateEditUnitEconomicModal = ({ editMode = false, editData = null }) => {
             productName: '',
             vendorCode: '',
             price: '',
-            ssp: 38,
+            rubRate: 1.11,
+            ssp: 0,
             tableData: getInitialTableData(),
         },
     });
 
-    // Загрузка данных при редактировании
     useEffect(() => {
         if (editMode && editData) {
             form.setValues({
@@ -383,13 +383,13 @@ const CreateEditUnitEconomicModal = ({ editMode = false, editData = null }) => {
                 vendorCode: editData.vendorCode || '',
                 price: editData.price || '',
                 ssp: editData.ssp || 38,
+                rubRate: editData.rubRate || 1.11,
                 tableData: editData.tableData || getInitialTableData(),
             });
         } else {
             form.reset();
         }
     }, [editMode, editData, openDetailsState]);
-
     const handleChange = (index, field, value) => {
         const updatedTable = [...form.values.tableData];
         updatedTable[index] = { ...updatedTable[index], [field]: value };
@@ -480,6 +480,22 @@ const CreateEditUnitEconomicModal = ({ editMode = false, editData = null }) => {
                             variant="filled"
                             label="Процент СПП"
                             {...form.getInputProps('ssp')}
+                            onChange={(value) => {
+                                form.setFieldValue('ssp', value);
+                                const updatedValues = { ...form.values, ssp: value };
+                                const newTable = calculateUnitEconomic(updatedValues);
+                                form.setFieldValue('tableData', newTable.tableData);
+                            }}
+                            onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
+                        />
+                        <NumberInput
+                            radius="md"
+                            variant="filled"
+                            label="Курс рубля"
+                            withAsterisk
+                            placeholder="Введите курс"
+                            style={{ width: 200 }}
+                            {...form.getInputProps('rubRate')}
                             onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                         />
                     </div>

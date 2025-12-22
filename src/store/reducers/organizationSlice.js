@@ -13,6 +13,7 @@ const initialState = {
     organizationListById: [],
     openCreateOrganizationState: false,
     editOrganizationOpenState: false,
+    basicAnalytic: null,
 };
 
 export const getOrganizationList = createAsyncThunk(
@@ -104,6 +105,30 @@ export const diactiveOrganization = createAsyncThunk(
     }
 );
 
+export const getOrganizationBasicAnalytics = createAsyncThunk(
+    'organization/getOrganizationBasicAnalytics',
+    async (query, { rejectWithValue }) => {
+        const params = new URLSearchParams();
+
+        console.log(query, ' query');
+        const { organizationId } = query;
+
+        if (organizationId) {
+            params.append('organizationId', organizationId);
+        }
+
+        try {
+            const response = await axiosInstance.get(`/rnp-statistic/basic`, { params });
+
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
 const organizationSlice = createSlice({
     name: 'organization',
     initialState,
@@ -159,6 +184,20 @@ const organizationSlice = createSlice({
                 state.loading = false;
             })
             .addCase(diactiveOrganization.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            //getOrganizationBasicAnalytics
+            .addCase(getOrganizationBasicAnalytics.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrganizationBasicAnalytics.fulfilled, (state, action) => {
+                state.loading = false;
+                state.basicAnalytic = action.payload;
+            })
+            .addCase(getOrganizationBasicAnalytics.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

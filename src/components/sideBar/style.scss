@@ -39,8 +39,10 @@
       }
 
       .logoImage {
-        width: 200px;
+        width: 100px;
         transition: transform 0.3s ease;
+        transform: scale(1.7);
+        transform-origin: center;
 
         img {
           width: 100%;
@@ -54,7 +56,7 @@
         margin-top: 0;
         margin-bottom: 10px;
         .logoImage {
-          transform: scale(0.5);  // уменьшение лого при сворачивании
+          transform: scale(1);  // уменьшение лого при сворачивании
         }
 
         .toggleButton {
