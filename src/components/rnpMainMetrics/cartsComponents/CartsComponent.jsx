@@ -2,8 +2,23 @@ import React from 'react';
 import './style.scss';
 
 const CartsComponent = ({ title, value, symbol, description }) => {
-    const formattedValue =
-        typeof value === 'number' ? value.toLocaleString() : value || 'Нет данных';
+    const formatValue = (val, sym) => {
+        if (val === null || val === undefined || isNaN(val)) {
+            return 'Нет данных';
+        }
+
+        const isCurrency = sym === 'сом' || sym === '₽' || sym === '$' || sym === '€';
+
+        if (isCurrency) {
+            return Math.round(val)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        return typeof val === 'number' ? val.toLocaleString('ru-RU') : val;
+    };
+
+    const formattedValue = formatValue(value, symbol);
 
     return (
         <div className="cart-component">

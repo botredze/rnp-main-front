@@ -18,6 +18,7 @@ const MainPage = () => {
     const { selectedProduct } = useSelector((state) => state.products);
     const dispatch = useDispatch();
 
+    console.log(selectedProduct, 'selectedProduct');
     const timePeriods = [
         {
             key: 'day',
@@ -70,10 +71,10 @@ const MainPage = () => {
     };
 
     useEffect(() => {
-        if (selectedProduct.id !== 0) {
+        if (selectedProduct?.id !== 0) {
             dispatch(
                 getProductRnpStatistic({
-                    productId: selectedProduct.id,
+                    productId: selectedProduct?.id,
                     timePeriod: selectedTimePeriod,
                     startDate: customRange[0],
                     endDate: customRange[1],
@@ -89,9 +90,9 @@ const MainPage = () => {
             </div>
 
             <div className="container">
-                {selectedProduct.id === 0 && <RnpMetrics />}
+                {selectedProduct?.id === 0 && <RnpMetrics />}
 
-                {selectedProduct.id !== 0 && (
+                {selectedProduct?.id !== 0 && (
                     <>
                         <div className="title">
                             <h3>Рука на пульсе</h3>

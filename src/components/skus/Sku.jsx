@@ -27,18 +27,41 @@ const Skus = () => {
     }, [organization]);
 
     useEffect(() => {
-        if (selectedProduct.id !== 0) {
+        if (selectedProduct?.id && selectedProduct.id !== 0) {
             setSelectedSku(selectedProduct);
+        } else {
+            setSelectedSku(null);
         }
     }, [selectedProduct]);
 
-    const handleSelect = (value) => {
-        const foundSku = productList.find((item) => String(item.id) === String(value));
-        setSelectedSku(foundSku);
+    // Сброс при размонтировании компонента
+    useEffect(() => {
+        return () => {
+            setSelectedSku(null);
+            dispatch(setSelectedProduct({ id: 0 }));
+        };
+    }, []);
 
-        if (!!value) {
+    const handleSelect = (value) => {
+        if (!value) {
+            // Очистка выбора
+            setSelectedSku(null);
+            dispatch(setSelectedProduct({ id: 0 }));
+            return;
+        }
+
+        const foundSku = productList.find((item) => String(item.id) === String(value));
+        if (foundSku) {
+            setSelectedSku(foundSku);
             dispatch(setSelectedProduct(foundSku));
         }
+    };
+
+    const formatNumber = (value) => {
+        if (!value || isNaN(value)) return 0;
+        return Math.round(value)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
 
     return (
@@ -52,16 +75,18 @@ const Skus = () => {
                     label="Выберите артикул"
                     placeholder="Начните вводить..."
                     searchable
+                    clearable
                     nothingFoundMessage="Ничего не найдено"
                     data={productList.map((item) => ({
                         value: String(item.id),
                         label: `${item.vendorCode}`,
                     }))}
+                    value={selectedSku?.id ? String(selectedSku.id) : null}
                     onChange={handleSelect}
                 />
             </div>
 
-            {selectedSku && (
+            {selectedSku && selectedSku.id !== 0 && (
                 <Card shadow="sm" radius="lg" withBorder mt="md" p="md">
                     <Title order={5}>{selectedSku?.vendorCode}</Title>
 
@@ -99,9 +124,9 @@ const Skus = () => {
                     <div className="sizesTable">
                         <table>
                             <tbody>
-                                {selectedSku?.metricsCalculated?.sizes_left?.map((size) => (
-                                    <tr key={size.size || size.quantity}>
-                                        <td>{size.size || size.wbSize}</td>
+                                {selectedSku?.metricsCalculated?.sizes_left?.map((size, index) => (
+                                    <tr key={`${size.size || size.wbSize}-${index}`}>
+                                        <td>{size.size || size.wbSize || '-'}</td>
                                         <td>{size.quantity ?? 0}</td>
                                     </tr>
                                 ))}
@@ -112,12 +137,13 @@ const Skus = () => {
                     <Group mt="md" justify="space-between">
                         <Text size="sm">
                             Процент выкупа:
-                            {`  ${parseInt(selectedSku?.metricsCalculated?.avg_buy_out_percent_5_days)}`}
+                            {`  ${parseInt(selectedSku?.metricsCalculated?.avg_buy_out_percent_5_days) || 0}`}
                             %
                         </Text>
                         <Text size="sm">
                             Капитализация остатков:
-                            {`  ${parseInt(selectedSku?.metricsCalculated?.capitalization_rub)}`} ₽
+                            {`  ${formatNumber(selectedSku?.metricsCalculated?.capitalization_rub)}`}
+                            ₽
                         </Text>
                     </Group>
                 </Card>
