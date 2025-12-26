@@ -10,6 +10,9 @@ import AdminPanel from '../pages/adminPanel/AdminPanel.jsx';
 import FinanceReportPage from '../pages/FinanceReportPage/FinanceReportPage.jsx';
 import HelloPage from '../pages/helloPage/HelloPage.jsx';
 import { getOrganizationList } from '../store/reducers/organizationSlice.js';
+import CostPrice from '../pages/costPrice/CostPrice.jsx';
+import PnlReport from '../pages/pnlReport/PnlReport.jsx';
+import OtherExpenses from '../pages/otherExpenses/OtherExpenses.jsx';
 
 const PrivateRoute = ({ children }) => {
     const token = useSelector((state) => state.auth.token);
@@ -116,6 +119,39 @@ const MainRouter = () => {
                         <PrivateRoute>
                             <OrganizationGuard>
                                 <FinanceReportPage />
+                            </OrganizationGuard>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/other-expenses"
+                    element={
+                        <PrivateRoute>
+                            <OrganizationGuard>
+                                <OtherExpenses />
+                            </OrganizationGuard>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/pnlReport"
+                    element={
+                        <PrivateRoute>
+                            <OrganizationGuard>
+                                <PnlReport />
+                            </OrganizationGuard>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/costPrice"
+                    element={
+                        <PrivateRoute>
+                            <OrganizationGuard>
+                                <CostPrice />
                             </OrganizationGuard>
                         </PrivateRoute>
                     }

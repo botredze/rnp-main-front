@@ -245,7 +245,9 @@ const RnpMain = () => {
                             )}
                             {statistic.map((data, i) => (
                                 <TableCell key={i} align="center">
-                                    {DateTime.fromISO(data.date).toFormat('dd.MM.yyyy')}
+                                    {DateTime.fromISO(data.date, { zone: 'utc' }).toFormat(
+                                        'dd.MM.yyyy'
+                                    )}
                                 </TableCell>
                             ))}
                         </TableRow>

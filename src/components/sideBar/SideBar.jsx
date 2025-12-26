@@ -20,6 +20,9 @@ import {
     setSelectedOrganization,
 } from '../../store/reducers/organizationSlice.js';
 import { logout } from '../../store/reducers/authSlice.js';
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import ScoreOutlinedIcon from '@mui/icons-material/ScoreOutlined';
+import CurrencyExchangeOutlinedIcon from '@mui/icons-material/CurrencyExchangeOutlined';
 
 const SideBar = () => {
     const [selectedIP, setSelectedIP] = useState(null);
@@ -72,6 +75,13 @@ const SideBar = () => {
         { to: '/', label: 'РНП Аналитика', icon: <IconChartBar size={20} /> },
         { to: '/unitEconomic', label: 'Юнит экономика', icon: <IconCoin size={20} /> },
         { to: '/reports', label: 'Отчеты', icon: <IconFileAnalytics size={20} /> },
+        { to: '/costPrice', label: 'Себестоимость', icon: <ShoppingBagOutlinedIcon size={20} /> },
+        // {
+        //     to: '/other-expenses',
+        //     label: 'Прочие расходы',
+        //     icon: <CurrencyExchangeOutlinedIcon size={20} />,
+        // },
+        // { to: '/pnlReport', label: 'ОПиУ', icon: <ScoreOutlinedIcon size={20} /> },
         { to: '/settings', label: 'Настройки', icon: <IconSettings size={20} /> },
     ];
 
