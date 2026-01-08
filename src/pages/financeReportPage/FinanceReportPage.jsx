@@ -1,7 +1,21 @@
-import React, { useState } from 'react';
-import { Tabs, Modal, Button, FileInput, Select, Paper, Text, Group, Stack } from '@mantine/core';
+// pages/FinanceReportPage.jsx
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    Tabs,
+    Modal,
+    Button,
+    FileInput,
+    Select,
+    Paper,
+    Text,
+    Group,
+    Stack,
+    Alert,
+} from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { IconUpload, IconBook } from '@tabler/icons-react';
+import { IconUpload, IconBook, IconAlertCircle } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
 import 'dayjs/locale/ru';
 
 import Dashboard from '../../components/FinanceReports/dashboard/Dashboard.jsx';
@@ -9,299 +23,133 @@ import SummaryReport from '../../components/FinanceReports/report/SummaryReport.
 import ProfitLossReport from '../../components/FinanceReports/pnl/ProfitLossReport.jsx';
 import DetailedReport from '../../components/FinanceReports/details/DetailedReport.jsx';
 
+import {
+    uploadDetailedReport,
+    uploadWeeklyReport,
+    getAvailableDates,
+    getOrganizationDashboard,
+    getOrganizationSummaryReport,
+    clearUploadError,
+} from '../../store/reducers/reportsSlice';
+
 const FinanceReportPage = () => {
+    const dispatch = useDispatch();
+    const { organization } = useSelector((state) => state.organization);
+    const {
+        dashboardData,
+        summaryReportData,
+        availableDates,
+        dashboardLoading,
+        summaryLoading,
+        uploadLoading,
+        uploadError,
+    } = useSelector((state) => state.reports);
+
     const [modalOpened, setModalOpened] = useState(false);
+    const [uploadType, setUploadType] = useState('detailed'); // 'detailed' | 'weekly'
     const [selectedFile, setSelectedFile] = useState(null);
-    const [dateRange, setDateRange] = useState('aug-2025');
+    const [dateRange, setDateRange] = useState('current-month');
     const [customRange, setCustomRange] = useState([null, null]);
     const [activeTab, setActiveTab] = useState('dashboard');
 
-    // Данные для метрик (Dashboard)
-    const metricsData = [
-        {
-            title: 'Чистая прибыль',
-            value: '-3 658 сом',
-            subtitle: 'Маржа: -2.5%',
-            change: '-112.3%',
-            isNegative: true,
-        },
-        {
-            title: 'Выручка',
-            value: '145 805 сом',
-            subtitle: '61 продаж',
-            badge: '4 возвр.',
-            change: '-13%',
-            isNegative: true,
-        },
-        {
-            title: 'Продано на WB',
-            value: '114 997 сом',
-            subtitle: 'По розничной цене',
-            change: '-11.7%',
-            isNegative: true,
-        },
-        {
-            title: 'Удержания WB',
-            value: '126 171 сом',
-            subtitle: 'Все расходы на площадке',
-            change: '+16.4%',
-            isNegative: true,
-        },
-        {
-            title: 'Комиссия WB',
-            value: '37 788 сом',
-            subtitle: '25.9% от выручки',
-            change: '-13%',
-            isNegative: false,
-        },
-        {
-            title: 'Логистика',
-            value: '25 769 сом',
-            subtitle: '17.7% от выручки',
-            badge: '195 доставок',
-            change: '-26%',
-            isNegative: false,
-        },
-        {
-            title: 'Прочие расходы',
-            value: '62 613 сом',
-            subtitle: 'Штрафы, хранение, реклама',
-            change: '+107.8%',
-            isNegative: true,
-        },
-        {
-            title: 'Бизнес-расходы',
-            value: '0 сом',
-            subtitle: 'Внесённые вручную',
-            change: null,
-            isNegative: false,
-        },
-        {
-            title: 'Себестоимость',
-            value: '22 900 сом',
-            subtitle: '15.7% от выручки',
-            change: '-20.2%',
-            isNegative: false,
-        },
-        {
-            title: 'Налог',
-            value: '393 сом',
-            subtitle: '2%',
-            change: '-67.1%',
-            isNegative: false,
-        },
-        {
-            title: 'Маржинальность',
-            value: '-2.5%',
-            subtitle: 'Чистая прибыль / Выручка',
-            change: '-114.1%',
-            isNegative: true,
-        },
-        {
-            title: 'Рентабельность',
-            value: '-16.0%',
-            subtitle: 'ROI (прибыль / затраты)',
-            change: '-115.4%',
-            isNegative: true,
-        },
-        {
-            title: 'Капитализация склада',
-            value: '2 902 589 сом',
-            subtitle: '6 894 шт на складе',
-            change: null,
-            isNegative: false,
-        },
-        {
-            title: 'Потенциал прибыли',
-            value: '-463 704 сом',
-            subtitle: 'Капитализация × ROI',
-            change: '-115.4%',
-            isNegative: true,
-        },
-    ];
+    useEffect(() => {
+        if (organization?.id) {
+            dispatch(getAvailableDates(organization.id));
+        }
+    }, [organization, dispatch]);
 
-    // Данные для таблиц (SummaryReport)
-    const tableData = {
-        months: [
-            { label: 'август', startDate: '1-авг.-2025', endDate: '3-авг.-2025' },
-            { label: 'август', startDate: '4-авг.-2025', endDate: '10-авг.-2025' },
-            { label: 'август', startDate: '11-авг.-2025', endDate: '17-авг.-2025' },
-            { label: 'август', startDate: '18-авг.-2025', endDate: '24-авг.-2025' },
-            { label: 'август', startDate: '25-авг.-2025', endDate: '31-авг.-2025' },
-            { label: 'сентябрь', startDate: '1-сент.-2025', endDate: '7-сент.-2025' },
-        ],
-        salesData: [
-            { sales: 0, returns: 0, deliveries: 0, returnQty: 0 },
-            { sales: 2265, returns: 9, deliveries: 2610, returnQty: 348 },
-            { sales: 2001, returns: 7, deliveries: 2377, returnQty: 376 },
-            { sales: 1727, returns: 6, deliveries: 2044, returnQty: 322 },
-            { sales: 1634, returns: 12, deliveries: 1996, returnQty: 374 },
-            { sales: 0, returns: 0, deliveries: 0, returnQty: 0 },
-        ],
-        avgData: [
-            { price: 0, commission: 0, transfer: 0, delivery: 0, cost: 0, margin: 0 },
-            { price: 1101, commission: -22, transfer: 1123, delivery: 86, cost: 572, margin: 465 },
-            { price: 1089, commission: -6, transfer: 1095, delivery: 85, cost: 565, margin: 444 },
-            { price: 1157, commission: 8, transfer: 1150, delivery: 82, cost: 569, margin: 499 },
-            { price: 1198, commission: 35, transfer: 1163, delivery: 79, cost: 539, margin: 546 },
-            { price: 0, commission: 0, transfer: 0, delivery: 0, cost: 0, margin: 0 },
-        ],
-        financeData: [
-            {
-                revenue: 0,
-                commission: 0,
-                commissionPct: '-',
-                transfer: 0,
-                deliveryCost: 0,
-                fines: 0,
-                acceptance: 0,
-                deductions: 0,
-                storage: 0,
-                totalPay: 0,
-                cost: 0,
-                profit: 0,
-            },
-            {
-                revenue: 2483408,
-                commission: -50649,
-                commissionPct: '-2.0%',
-                transfer: 2534057,
-                deliveryCost: 253334,
-                fines: 66,
-                acceptance: 0,
-                deductions: 0,
-                storage: 28091,
-                totalPay: 2253909,
-                cost: 1291130,
-                profit: 962779,
-            },
-            {
-                revenue: 2170692,
-                commission: -12641,
-                commissionPct: '-0.6%',
-                transfer: 2183332,
-                deliveryCost: 235078,
-                fines: 1275,
-                acceptance: 0,
-                deductions: 0,
-                storage: 26934,
-                totalPay: 1922757,
-                cost: 1127350,
-                profit: 795407,
-            },
-            {
-                revenue: 1991499,
-                commission: 12943,
-                commissionPct: '0.6%',
-                transfer: 1978556,
-                deliveryCost: 192994,
-                fines: 0,
-                acceptance: 0,
-                deductions: 0,
-                storage: 27891,
-                totalPay: 1757670,
-                cost: 979230,
-                profit: 778440,
-            },
-            {
-                revenue: 1943244,
-                commission: 56165,
-                commissionPct: '2.9%',
-                transfer: 1887079,
-                deliveryCost: 186652,
-                fines: 0,
-                acceptance: 0,
-                deductions: 0,
-                storage: 0,
-                totalPay: 1700427,
-                cost: 874170,
-                profit: 826257,
-            },
-            {
-                revenue: 0,
-                commission: 0,
-                commissionPct: '-',
-                transfer: 0,
-                deliveryCost: 0,
-                fines: 0,
-                acceptance: 0,
-                deductions: 0,
-                storage: 0,
-                totalPay: 0,
-                cost: 0,
-                profit: 0,
-            },
-        ],
-        corrections: [
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: 1343,
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: 2711,
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: '',
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: '',
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: '',
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-            {
-                acquiring: '',
-                replacedGoods: '',
-                lostGoods: '',
-                defect: '',
-                salesCorrection: '',
-                logisticsCorrection: '',
-                advancePayment: '',
-            },
-        ],
+    useEffect(() => {
+        if (organization?.id && dateRange) {
+            loadReports();
+        }
+    }, [organization, dateRange, customRange]);
+
+    const loadReports = () => {
+        if (!organization?.id) return;
+
+        const params = {
+            organizationId: organization.id,
+        };
+
+        if (dateRange === 'custom' && customRange[0] && customRange[1]) {
+            params.startDate = customRange[0].toISOString().split('T')[0];
+            params.endDate = customRange[1].toISOString().split('T')[0];
+        } else if (dateRange !== 'custom') {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            switch (dateRange) {
+                case 'current-month':
+                    params.startDate = new Date(year, month, 1).toISOString().split('T')[0];
+                    params.endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+                    break;
+                case 'last-month':
+                    params.startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
+                    params.endDate = new Date(year, month, 0).toISOString().split('T')[0];
+                    break;
+            }
+        }
+
+        if (activeTab === 'dashboard') {
+            dispatch(getOrganizationDashboard(params));
+        } else if (activeTab === 'summary') {
+            dispatch(getOrganizationSummaryReport(params));
+        }
     };
 
-    const handleFileUpload = () => {
-        if (selectedFile) {
-            console.log('Uploading file:', selectedFile);
-            // Здесь будет логика загрузки файла
+    const handleFileUpload = async () => {
+        if (!selectedFile || !organization?.id) {
+            notifications.show({
+                title: 'Ошибка',
+                message: 'Выберите файл для загрузки',
+                color: 'red',
+                icon: <IconAlertCircle />,
+            });
+            return;
+        }
+
+        try {
+            const uploadAction =
+                uploadType === 'detailed' ? uploadDetailedReport : uploadWeeklyReport;
+
+            await dispatch(
+                uploadAction({
+                    file: selectedFile,
+                    organizationId: organization.id,
+                })
+            ).unwrap();
+
+            notifications.show({
+                title: 'Успешно',
+                message: `${uploadType === 'detailed' ? 'Детализированный' : 'Еженедельный'} отчет загружен`,
+                color: 'green',
+            });
+
             setModalOpened(false);
             setSelectedFile(null);
+
+            // Перезагружаем данные
+            loadReports();
+            dispatch(getAvailableDates(organization.id));
+        } catch (error) {
+            notifications.show({
+                title: 'Ошибка',
+                message: error.message || 'Не удалось загрузить отчет',
+                color: 'red',
+                icon: <IconAlertCircle />,
+            });
         }
+    };
+
+    const openUploadModal = (type) => {
+        setUploadType(type);
+        setModalOpened(true);
+        dispatch(clearUploadError());
     };
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa', padding: '24px' }}>
-            {/* Шапка страницы */}
             <Paper shadow="xs" p="lg" radius="md" mb="xl">
                 <Group justify="space-between" align="center" wrap="wrap" gap="md">
                     <Text size="xl" fw={700}>
@@ -313,21 +161,30 @@ const FinanceReportPage = () => {
                             value={dateRange}
                             onChange={setDateRange}
                             data={[
-                                { value: 'aug-2025', label: 'Август 2025' },
-                                { value: 'sep-2025', label: 'Сентябрь 2025' },
-                                { value: 'oct-2025', label: 'Октябрь 2025' },
+                                { value: 'current-month', label: 'Текущий месяц' },
+                                { value: 'last-month', label: 'Прошлый месяц' },
+                                { value: 'custom', label: 'Выбрать период' },
+                                ...(availableDates?.availableMonths?.map((month) => ({
+                                    value: month,
+                                    label: new Date(month).toLocaleDateString('ru-RU', {
+                                        month: 'long',
+                                        year: 'numeric',
+                                    }),
+                                })) || []),
                             ]}
-                            style={{ width: 180 }}
+                            style={{ width: 200 }}
                         />
 
-                        <DatePickerInput
-                            type="range"
-                            placeholder="Выберите период"
-                            value={customRange}
-                            onChange={setCustomRange}
-                            locale="ru"
-                            style={{ width: 250 }}
-                        />
+                        {dateRange === 'custom' && (
+                            <DatePickerInput
+                                type="range"
+                                placeholder="Выберите период"
+                                value={customRange}
+                                onChange={setCustomRange}
+                                locale="ru"
+                                style={{ width: 250 }}
+                            />
+                        )}
 
                         <Button variant="default" leftSection={<IconBook size={16} />}>
                             Инструкции
@@ -335,12 +192,26 @@ const FinanceReportPage = () => {
 
                         <Button
                             leftSection={<IconUpload size={16} />}
-                            onClick={() => setModalOpened(true)}
+                            onClick={() => openUploadModal('weekly')}
                         >
-                            Загрузить отчет
+                            Загрузить еженедельный
+                        </Button>
+
+                        <Button
+                            leftSection={<IconUpload size={16} />}
+                            onClick={() => openUploadModal('detailed')}
+                            variant="light"
+                        >
+                            Загрузить детальный
                         </Button>
                     </Group>
                 </Group>
+
+                {availableDates && (
+                    <Text size="sm" c="dimmed" mt="sm">
+                        Доступные отчеты: с {availableDates.minDate} по {availableDates.maxDate}
+                    </Text>
+                )}
             </Paper>
 
             {/* Табы */}
@@ -353,11 +224,31 @@ const FinanceReportPage = () => {
                 </Tabs.List>
 
                 <Tabs.Panel value="dashboard" pt="xl">
-                    <Dashboard metrics={metricsData} />
+                    {dashboardLoading ? (
+                        <Text ta="center" py="xl">
+                            Загрузка...
+                        </Text>
+                    ) : dashboardData ? (
+                        <Dashboard metrics={dashboardData.metrics} />
+                    ) : (
+                        <Alert color="blue" title="Нет данных">
+                            Загрузите отчеты для отображения дашборда
+                        </Alert>
+                    )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="summary" pt="xl">
-                    <SummaryReport tableData={tableData} />
+                    {summaryLoading ? (
+                        <Text ta="center" py="xl">
+                            Загрузка...
+                        </Text>
+                    ) : summaryReportData ? (
+                        <SummaryReport tableData={summaryReportData} />
+                    ) : (
+                        <Alert color="blue" title="Нет данных">
+                            Загрузите отчеты для отображения сводной информации
+                        </Alert>
+                    )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="profit-loss" pt="xl">
@@ -375,8 +266,9 @@ const FinanceReportPage = () => {
                 onClose={() => {
                     setModalOpened(false);
                     setSelectedFile(null);
+                    dispatch(clearUploadError());
                 }}
-                title="Загрузить отчет Excel"
+                title={`Загрузить ${uploadType === 'detailed' ? 'детализированный' : 'еженедельный'} отчет`}
                 centered
             >
                 <Stack gap="md">
@@ -394,6 +286,12 @@ const FinanceReportPage = () => {
                         </Text>
                     )}
 
+                    {uploadError && (
+                        <Alert icon={<IconAlertCircle />} color="red">
+                            {uploadError.message || 'Произошла ошибка при загрузке'}
+                        </Alert>
+                    )}
+
                     <Group justify="flex-end" gap="sm">
                         <Button
                             variant="default"
@@ -405,7 +303,11 @@ const FinanceReportPage = () => {
                             Отмена
                         </Button>
 
-                        <Button onClick={handleFileUpload} disabled={!selectedFile}>
+                        <Button
+                            onClick={handleFileUpload}
+                            disabled={!selectedFile}
+                            loading={uploadLoading}
+                        >
                             Загрузить
                         </Button>
                     </Group>

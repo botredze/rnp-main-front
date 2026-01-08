@@ -1,235 +1,356 @@
-import React, { useState } from 'react';
-import { Table, Paper, Text, Stack } from '@mantine/core';
+import React from 'react';
+import { Table, Paper, Text, Stack, ScrollArea } from '@mantine/core';
 import 'dayjs/locale/ru';
+import './style.scss';
 
 const SummaryReport = ({ tableData }) => {
+    if (!tableData || !tableData.months) {
+        return (
+            <Paper withBorder p="xl" radius="md" style={{ textAlign: 'center' }}>
+                <Text c="dimmed">Нет данных для отображения</Text>
+            </Paper>
+        );
+    }
+
     return (
         <Stack gap="xl">
-            {/* Таблица продаж */}
+            {/* Таблица продаж - С ДАТАМИ */}
             <Paper withBorder p="md" radius="md">
                 <Text size="lg" fw={600} mb="md">
                     Продажи и доставки
                 </Text>
-                <div style={{ overflowX: 'auto' }}>
-                    <Table striped highlightOnHover withTableBorder withColumnBorders>
+                <ScrollArea>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        withColumnBorders
+                        className="summary-table"
+                    >
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th>Месяц</Table.Th>
+                                <Table.Th className="first-column" rowSpan={3}>
+                                    Показатель
+                                </Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.label}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.label}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Th>Начало недели</Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.startDate}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.startDate}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Th>Конец недели</Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.endDate}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.endDate}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
                             <Table.Tr>
-                                <Table.Td fw={600}>Количество продаж</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Количество продаж
+                                </Table.Td>
                                 {tableData.salesData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.sales || 0}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.sales || 0}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Количество возвратов</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Количество возвратов
+                                </Table.Td>
                                 {tableData.salesData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.returns || 0}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Количество доставок</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Количество доставок
+                                </Table.Td>
                                 {tableData.salesData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.deliveries || 0}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.deliveries || 0}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Количество возврата</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Количество возврата
+                                </Table.Td>
                                 {tableData.salesData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.returnQty || 0}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                         </Table.Tbody>
                     </Table>
-                </div>
+                </ScrollArea>
             </Paper>
 
-            {/* Таблица средних показателей */}
+            {/* Таблица средних показателей - БЕЗ ДАТ */}
             <Paper withBorder p="md" radius="md">
                 <Text size="lg" fw={600} mb="md">
                     Средние показатели
                 </Text>
-                <div style={{ overflowX: 'auto' }}>
-                    <Table striped highlightOnHover withTableBorder withColumnBorders>
+                <ScrollArea>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        withColumnBorders
+                        className="summary-table"
+                    >
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th>Показатель</Table.Th>
+                                <Table.Th className="first-column">Показатель</Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.label}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.label}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
                             <Table.Tr>
-                                <Table.Td fw={600}>Средняя цена</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Средняя цена
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.price || 0}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.price || 0}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Средняя комиссия</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Средняя комиссия
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx} c={data.commission < 0 ? 'red' : undefined}>
+                                    <Table.Td
+                                        key={idx}
+                                        className="month-column"
+                                        ta="right"
+                                        c={data.commission < 0 ? 'red' : undefined}
+                                    >
                                         {data.commission || 0}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Среднее к перечислению</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Среднее к перечислению
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.transfer || 0}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.transfer || 0}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Средний расход на доставку</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Средний расход на доставку
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.delivery || 0}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Средняя себестоимость</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Средняя себестоимость
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.cost || 0}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Средняя маржа</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Средняя маржа
+                                </Table.Td>
                                 {tableData.avgData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.margin || 0}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.margin || 0}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                         </Table.Tbody>
                     </Table>
-                </div>
+                </ScrollArea>
             </Paper>
 
-            {/* Финансовая таблица */}
+            {/* Финансовая таблица - БЕЗ ДАТ */}
             <Paper withBorder p="md" radius="md">
                 <Text size="lg" fw={600} mb="md">
                     Финансовые показатели
                 </Text>
-                <div style={{ overflowX: 'auto' }}>
-                    <Table striped highlightOnHover withTableBorder withColumnBorders>
+                <ScrollArea>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        withColumnBorders
+                        className="summary-table"
+                    >
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th>Показатель</Table.Th>
+                                <Table.Th className="first-column">Показатель</Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.label}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.label}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
-                            <Table.Tr style={{ backgroundColor: '#f8f9fa' }}>
-                                <Table.Td fw={700}>Выручка</Table.Td>
+                            <Table.Tr className="highlight-row">
+                                <Table.Td className="first-column" fw={700}>
+                                    Выручка
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} fw={600}>
+                                    <Table.Td
+                                        key={idx}
+                                        className="month-column"
+                                        ta="right"
+                                        fw={600}
+                                    >
                                         {data.revenue.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Комиссия ВБ</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Комиссия ВБ
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} c={data.commission < 0 ? 'red' : undefined}>
+                                    <Table.Td
+                                        key={idx}
+                                        className="month-column"
+                                        ta="right"
+                                        c={data.commission < 0 ? 'red' : undefined}
+                                    >
                                         {data.commission.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Комиссия %</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Комиссия %
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.commissionPct}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.commissionPct}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>К перечислению</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    К перечислению
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.transfer.toLocaleString()}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.transfer.toLocaleString()}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Расходы на доставку</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Расходы на доставку
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.deliveryCost.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Штрафы</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Штрафы
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.fines.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Приемка</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Приемка
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.acceptance}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.acceptance}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Удержания</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Удержания
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.deductions}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.deductions}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Хранение</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Хранение
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.storage.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
-                            <Table.Tr style={{ backgroundColor: '#f8f9fa' }}>
-                                <Table.Td fw={700}>Итого к оплате</Table.Td>
+                            <Table.Tr className="highlight-row">
+                                <Table.Td className="first-column" fw={700}>
+                                    Итого к оплате
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} fw={600}>
+                                    <Table.Td
+                                        key={idx}
+                                        className="month-column"
+                                        ta="right"
+                                        fw={600}
+                                    >
                                         {data.totalPay.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Себестоимость</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Себестоимость
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
-                                    <Table.Td key={idx} c="red">
+                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
                                         {data.cost.toLocaleString()}
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
-                            <Table.Tr style={{ backgroundColor: '#f8f9fa' }}>
-                                <Table.Td fw={700}>Чистая прибыль</Table.Td>
+                            <Table.Tr className="highlight-row">
+                                <Table.Td className="first-column" fw={700}>
+                                    Чистая прибыль
+                                </Table.Td>
                                 {tableData.financeData.map((data, idx) => (
                                     <Table.Td
                                         key={idx}
+                                        className="month-column"
+                                        ta="right"
                                         fw={600}
                                         c={data.profit < 0 ? 'red' : 'green'}
                                     >
@@ -239,70 +360,106 @@ const SummaryReport = ({ tableData }) => {
                             </Table.Tr>
                         </Table.Tbody>
                     </Table>
-                </div>
+                </ScrollArea>
             </Paper>
 
-            {/* Таблица корректировок */}
+            {/* Таблица корректировок - БЕЗ ДАТ */}
             <Paper withBorder p="md" radius="md">
                 <Text size="lg" fw={600} mb="md">
                     Корректировки
                 </Text>
-                <div style={{ overflowX: 'auto' }}>
-                    <Table striped highlightOnHover withTableBorder withColumnBorders>
+                <ScrollArea>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        withColumnBorders
+                        className="summary-table"
+                    >
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th>Показатель</Table.Th>
+                                <Table.Th className="first-column">Показатель</Table.Th>
                                 {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx}>{month.label}</Table.Th>
+                                    <Table.Th key={idx} className="month-column">
+                                        {month.label}
+                                    </Table.Th>
                                 ))}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
                             <Table.Tr>
-                                <Table.Td fw={600}>Корректировка эквайринга</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Корректировка эквайринга
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.acquiring || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.acquiring || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Компенсация подмененного товара</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Компенсация подмененного товара
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.replacedGoods || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.replacedGoods || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Компенсация потерянного товара</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Компенсация потерянного товара
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.lostGoods || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.lostGoods || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Компенсация брака</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Компенсация брака
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.defect || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.defect || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Коррекция продаж</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Коррекция продаж
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.salesCorrection || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.salesCorrection || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Коррекция логистика</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Коррекция логистика
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.logisticsCorrection || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.logisticsCorrection || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                             <Table.Tr>
-                                <Table.Td fw={600}>Авансовая оплата за товар без движения</Table.Td>
+                                <Table.Td className="first-column" fw={600}>
+                                    Авансовая оплата за товар без движения
+                                </Table.Td>
                                 {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx}>{data.advancePayment || '-'}</Table.Td>
+                                    <Table.Td key={idx} className="month-column" ta="right">
+                                        {data.advancePayment || '-'}
+                                    </Table.Td>
                                 ))}
                             </Table.Tr>
                         </Table.Tbody>
                     </Table>
-                </div>
+                </ScrollArea>
             </Paper>
         </Stack>
     );

@@ -1,0 +1,89 @@
+.detailed-table-container {
+  position: relative;
+  overflow: visible;
+
+  .mantine-ScrollArea-root {
+    overflow-x: auto;
+  }
+
+  .detailed-table {
+    min-width: 100%;
+    table-layout: auto;
+
+    .sticky-column {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background-color: white;
+      min-width: 120px;
+      max-width: 120px;
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+
+      // При hover на строке
+      tr:hover & {
+        background-color: var(--mantine-color-gray-0);
+      }
+
+      // При striped
+      tbody tr:nth-of-type(odd) & {
+        background-color: var(--mantine-color-gray-0);
+      }
+
+      tbody tr:nth-of-type(odd):hover & {
+        background-color: var(--mantine-color-gray-1);
+      }
+    }
+
+    thead th {
+      background-color: var(--mantine-color-gray-1);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      padding: 12px;
+      white-space: nowrap;
+
+      &.sticky-column {
+        z-index: 3;
+        background-color: var(--mantine-color-gray-1);
+      }
+    }
+
+    tbody td {
+      padding: 12px;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+  }
+}
+
+// Темная тема
+[data-mantine-color-scheme='dark'] {
+  .detailed-table-container {
+    .detailed-table {
+      .sticky-column {
+        background-color: var(--mantine-color-dark-7);
+
+        tr:hover & {
+          background-color: var(--mantine-color-dark-6);
+        }
+
+        tbody tr:nth-of-type(odd) & {
+          background-color: var(--mantine-color-dark-6);
+        }
+
+        tbody tr:nth-of-type(odd):hover & {
+          background-color: var(--mantine-color-dark-5);
+        }
+      }
+
+      thead th {
+        background-color: var(--mantine-color-dark-6);
+
+        &.sticky-column {
+          background-color: var(--mantine-color-dark-6);
+        }
+      }
+    }
+  }
+}

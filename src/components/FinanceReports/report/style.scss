@@ -1,0 +1,125 @@
+.summary-table {
+  min-width: 100%;
+  table-layout: fixed;
+
+  // Первая колонка - уменьшенная ширина
+  .first-column {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+    padding: 12px;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  // Колонки с месяцами - одинаковая ширина
+  .month-column {
+    width: 130px;
+    min-width: 130px;
+    max-width: 130px;
+    padding: 12px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  // Стили для заголовков
+  thead th {
+    background-color: var(--mantine-color-gray-1);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    border: 1px solid var(--mantine-color-gray-3);
+
+    &.first-column {
+      text-align: left;
+    }
+
+    &.month-column {
+      text-align: center;
+    }
+  }
+
+  // Стили для ячеек
+  tbody td {
+    font-size: 0.875rem;
+    vertical-align: middle;
+    border: 1px solid var(--mantine-color-gray-3);
+
+    &.first-column {
+      text-align: left;
+    }
+
+    &.month-column {
+      text-align: right;
+    }
+  }
+
+  // Подсвеченные строки
+  .highlight-row {
+    background-color: var(--mantine-color-blue-0) !important;
+
+    &:hover {
+      background-color: var(--mantine-color-blue-1) !important;
+    }
+
+    td {
+      font-weight: 600;
+    }
+  }
+
+  // Striped rows
+  tbody tr:nth-of-type(odd):not(.highlight-row) {
+    background-color: var(--mantine-color-gray-0);
+
+    &:hover {
+      background-color: var(--mantine-color-gray-1);
+    }
+  }
+
+  tbody tr:nth-of-type(even):not(.highlight-row) {
+    background-color: white;
+
+    &:hover {
+      background-color: var(--mantine-color-gray-0);
+    }
+  }
+}
+
+// Темная тема
+[data-mantine-color-scheme='dark'] {
+  .summary-table {
+    thead th {
+      background-color: var(--mantine-color-dark-6);
+      border-color: var(--mantine-color-dark-4);
+    }
+
+    tbody td {
+      border-color: var(--mantine-color-dark-4);
+    }
+
+    .highlight-row {
+      background-color: var(--mantine-color-dark-5) !important;
+
+      &:hover {
+        background-color: var(--mantine-color-dark-4) !important;
+      }
+    }
+
+    tbody tr:nth-of-type(odd):not(.highlight-row) {
+      background-color: var(--mantine-color-dark-6);
+
+      &:hover {
+        background-color: var(--mantine-color-dark-5);
+      }
+    }
+
+    tbody tr:nth-of-type(even):not(.highlight-row) {
+      background-color: var(--mantine-color-dark-7);
+
+      &:hover {
+        background-color: var(--mantine-color-dark-6);
+      }
+    }
+  }
+}

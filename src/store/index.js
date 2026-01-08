@@ -15,6 +15,8 @@ import organizationSlice from './reducers/organizationSlice';
 import authSlice from './reducers/authSlice';
 import productsSlice from './reducers/productsSlice.js';
 import usersSlice from './reducers/usersSlice.js';
+import costPriceSlice from './reducers/costPriceSlice.js';
+import reportsSlice from './reducers/reportsSlice.js';
 
 const rootReducer = combineReducers({
     auth: authSlice,
@@ -22,6 +24,8 @@ const rootReducer = combineReducers({
     organization: organizationSlice,
     products: productsSlice,
     users: usersSlice,
+    costPrice: costPriceSlice,
+    reports: reportsSlice,
 });
 
 const persistConfig = {

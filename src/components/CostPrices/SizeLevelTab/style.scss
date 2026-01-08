@@ -1,0 +1,15 @@
+.productLevelTab,
+.sizeLevelTab {
+  position: relative;
+  min-height: 400px;
+
+  .mantine-Table-table {
+    tbody tr {
+      cursor: default;
+
+      &:hover {
+        background-color: var(--mantine-color-gray-0);
+      }
+    }
+  }
+}
