@@ -64,7 +64,21 @@ export const updateOrganizationById = createAsyncThunk(
                 return response.data;
             }
         } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+            const errorData = error.response?.data;
+
+            if (errorData?.message) {
+                return rejectWithValue({
+                    message: errorData.message,
+                    field: errorData.field || null,
+                });
+            }
+
+            return rejectWithValue({
+                message:
+                    error.response?.data ||
+                    error.message ||
+                    'Произошла ошибка при обновлении организации',
+            });
         }
     }
 );
@@ -75,17 +89,32 @@ export const createOrganization = createAsyncThunk(
         try {
             const response = await axiosInstance.post(`/organization/create`, organization);
 
+            console.log(response, 'response');
             if (response.status === 200) {
                 return response.data;
             }
         } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+            const errorData = error.response?.data;
+
+            if (errorData?.message) {
+                return rejectWithValue({
+                    message: errorData.message,
+                    field: errorData.field || null,
+                });
+            }
+
+            return rejectWithValue({
+                message:
+                    error.response?.data ||
+                    error.message ||
+                    'Произошла ошибка при создании организации',
+            });
         }
     }
 );
 
 export const diactiveOrganization = createAsyncThunk(
-    'organization/createOrganization',
+    'organization/diactiveOrganization',
     async (organization, { rejectWithValue }) => {
         const { organizationId, action } = organization;
         const params = new URLSearchParams();
@@ -176,6 +205,34 @@ const organizationSlice = createSlice({
             })
 
             //create organizations
+            .addCase(createOrganization.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createOrganization.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(createOrganization.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload; // Сохраняем ошибку для отображения
+            })
+
+            //update organizations
+            .addCase(updateOrganizationById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateOrganizationById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(updateOrganizationById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload; // Сохраняем ошибку для отображения
+            })
+
+            //diactive organizations
             .addCase(diactiveOrganization.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -201,33 +258,6 @@ const organizationSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
-        //
-        // //updateOrganizationById
-        // .addCase(getOrganizationListByUserId.pending, (state) => {
-        //     state.loading = true;
-        //     state.error = null;
-        // })
-        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     state.organizationListById = action.payload;
-        // })
-        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.payload;
-        // })
-        // //diactive organization
-        // .addCase(getOrganizationListByUserId.pending, (state) => {
-        //     state.loading = true;
-        //     state.error = null;
-        // })
-        // .addCase(getOrganizationListByUserId.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     state.organizationListById = action.payload;
-        // })
-        // .addCase(getOrganizationListByUserId.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.payload;
-        // });
     },
 });
 

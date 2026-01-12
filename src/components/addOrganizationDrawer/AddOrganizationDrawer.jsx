@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Drawer, TextInput, Button, Group, Alert } from '@mantine/core';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { Drawer, TextInput, Button, Group, Alert, Loader } from '@mantine/core';
+import { IconInfoCircle, IconAlertCircle } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     setOpenCreateOrganizationState,
@@ -23,6 +23,8 @@ const AddOrganizationDrawer = () => {
     const [organizationName, setOrganizationName] = useState('');
     const [apiKey, setApiKey] = useState('');
     const [errors, setErrors] = useState({});
+    const [validationError, setValidationError] = useState('');
+    const [isValidating, setIsValidating] = useState(false);
 
     useEffect(() => {
         if (selectedOrganization) {
@@ -32,12 +34,17 @@ const AddOrganizationDrawer = () => {
             setOrganizationName('');
             setApiKey('');
         }
+        // Сброс ошибок при смене организации
+        setErrors({});
+        setValidationError('');
     }, [selectedOrganization]);
 
     const close = () => {
         setOrganizationName('');
         setApiKey('');
         setErrors({});
+        setValidationError('');
+        setIsValidating(false);
         dispatch(setOpenCreateOrganizationState(false));
         dispatch(setEditOrganizationOpenState(false));
     };
@@ -53,9 +60,14 @@ const AddOrganizationDrawer = () => {
     };
 
     const handleSubmit = async () => {
+        // Сброс предыдущих ошибок валидации
+        setValidationError('');
+
         if (!validate()) return;
 
         const data = { organizationName, apiKey };
+
+        setIsValidating(true);
 
         try {
             let resultAction;
@@ -83,9 +95,25 @@ const AddOrganizationDrawer = () => {
             if (resultAction.meta.requestStatus === 'fulfilled') {
                 await dispatch(getOrganizationList());
                 close();
+            } else if (resultAction.meta.requestStatus === 'rejected') {
+                // Обработка ошибки валидации API ключа
+                const error = resultAction.payload;
+
+                if (error?.message) {
+                    setValidationError(error.message);
+                } else if (error?.field === 'apiKey') {
+                    setErrors({ apiKey: error.message });
+                } else if (typeof error === 'string') {
+                    setValidationError(error);
+                } else {
+                    setValidationError('Произошла ошибка при сохранении организации');
+                }
             }
         } catch (err) {
             console.error('Ошибка запроса:', err);
+            setValidationError('Произошла неожиданная ошибка. Попробуйте еще раз');
+        } finally {
+            setIsValidating(false);
         }
     };
 
@@ -111,6 +139,20 @@ const AddOrganizationDrawer = () => {
                 </Alert>
             )}
 
+            {validationError && (
+                <Alert
+                    icon={<IconAlertCircle size={16} />}
+                    title="Ошибка валидации"
+                    color="red"
+                    variant="filled"
+                    mb="md"
+                    withCloseButton
+                    onClose={() => setValidationError('')}
+                >
+                    {validationError}
+                </Alert>
+            )}
+
             <TextInput
                 label="Название организации"
                 placeholder="Введите название организации"
@@ -119,23 +161,51 @@ const AddOrganizationDrawer = () => {
                 error={errors.organizationName}
                 mb="sm"
                 required
+                disabled={isValidating}
             />
 
             <TextInput
                 label="API ключ"
                 placeholder="Введите API ключ от Wildberries"
                 value={apiKey}
-                onChange={(e) => setApiKey(e.currentTarget.value)}
+                onChange={(e) => {
+                    setApiKey(e.currentTarget.value);
+                    // Сброс ошибки при изменении ключа
+                    if (errors.apiKey) {
+                        setErrors({ ...errors, apiKey: '' });
+                    }
+                    if (validationError) {
+                        setValidationError('');
+                    }
+                }}
                 error={errors.apiKey}
                 mb="sm"
                 required
+                disabled={isValidating}
             />
 
             <Group justify="center" mt="md">
-                <Button variant="light" color="green" radius="md" onClick={handleSubmit}>
-                    {isEdit ? 'Сохранить изменения' : 'Сохранить'}
+                <Button
+                    variant="light"
+                    color="green"
+                    radius="md"
+                    onClick={handleSubmit}
+                    disabled={isValidating}
+                    leftSection={isValidating && <Loader size="xs" color="white" />}
+                >
+                    {isValidating
+                        ? 'Проверка API ключа...'
+                        : isEdit
+                          ? 'Сохранить изменения'
+                          : 'Сохранить'}
                 </Button>
-                <Button variant="light" color="red" radius="md" onClick={close}>
+                <Button
+                    variant="light"
+                    color="red"
+                    radius="md"
+                    onClick={close}
+                    disabled={isValidating}
+                >
                     Отмена
                 </Button>
             </Group>

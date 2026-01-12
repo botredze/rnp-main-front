@@ -30,6 +30,7 @@ const SideBar = () => {
     const { organizationList, organization } = useSelector((state) => state.organization);
     const { user, role } = useSelector((state) => state.auth);
 
+    console.log(organizationList, 'organizationList');
     useEffect(() => {
         dispatch(getOrganizationList());
     }, [dispatch]);
@@ -134,7 +135,7 @@ const SideBar = () => {
                     <Select
                         label="Выберите ИП"
                         placeholder="Выбрать ИП"
-                        data={organizationList.map((org) => ({
+                        data={organizationList?.map((org) => ({
                             value: String(org.id),
                             label: org.organizationName,
                         }))}
