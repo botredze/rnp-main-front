@@ -1,86 +1,86 @@
+// Акцентные цвета по порядку карточек
+$colors: #4361ee, #7209b7, #2ecc71, #f48c06, #00b4d8, #e63946, #ef476f, #06d6a0, #118ab2, #ff6b35;
+
 .cart-component {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border-radius: 16px;
-  padding: 24px;
-  transition: all 0.3s ease;
-  border: 1px solid #333;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px 20px 26px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+
+  // Цветная полоска слева
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+  }
+
+  @for $i from 1 through length($colors) {
+    &:nth-child(#{$i})::before {
+      background: nth($colors, $i);
+    }
+    &:nth-child(#{$i}) .cart-component__value {
+      color: nth($colors, $i);
+    }
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-    border-color: #444;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
   }
 
   &__header {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   &__title {
-    color: #999;
-    font-size: 14px;
-    font-weight: 500;
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 600;
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
   }
 
   &__value {
-    color: #fff;
-    font-size: 32px;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.2;
+    letter-spacing: -0.5px;
   }
 
   &__description {
-    color: #666;
-    font-size: 14px;
+    color: #b0b8c4;
+    font-size: 12px;
     font-weight: 400;
+    margin-top: 2px;
   }
 }
 
-// Адаптивность
 @media (max-width: 1024px) {
-  .rnp-metrics {
-    &__grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-  }
-
   .cart-component {
-    padding: 20px;
+    padding: 16px 18px 16px 22px;
 
-    &__value {
-      font-size: 28px;
-    }
+    &__value { font-size: 22px; }
   }
 }
 
 @media (max-width: 768px) {
-  .rnp-metrics {
-    padding: 16px;
-
-    &__header h1 {
-      font-size: 24px;
-    }
-
-    &__grid {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-  }
-
   .cart-component {
-    padding: 16px;
+    padding: 14px 14px 14px 18px;
 
-    &__value {
-      font-size: 24px;
-    }
+    &__value { font-size: 20px; }
   }
 }

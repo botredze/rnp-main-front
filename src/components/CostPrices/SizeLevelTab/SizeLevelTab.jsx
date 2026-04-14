@@ -36,6 +36,7 @@ const SizeLevelTab = () => {
 
     useEffect(() => {
         if (organization?.id) {
+            setDataLoaded(false);
             dispatch(getOrganizationProductLis({ organizationId: organization.id }));
         }
     }, [organization, dispatch]);

@@ -29,6 +29,8 @@ import {
     getAvailableDates,
     getOrganizationDashboard,
     getOrganizationSummaryReport,
+    getDetailedReport,
+    getDetailedReportFilterOptions,
     clearUploadError,
 } from '../../store/reducers/reportsSlice';
 
@@ -48,7 +50,7 @@ const FinanceReportPage = () => {
     const [modalOpened, setModalOpened] = useState(false);
     const [uploadType, setUploadType] = useState('detailed'); // 'detailed' | 'weekly'
     const [selectedFile, setSelectedFile] = useState(null);
-    const [dateRange, setDateRange] = useState('current-month');
+    const [dateRange, setDateRange] = useState('last-month');
     const [customRange, setCustomRange] = useState([null, null]);
     const [activeTab, setActiveTab] = useState('dashboard');
 
@@ -58,45 +60,64 @@ const FinanceReportPage = () => {
         }
     }, [organization, dispatch]);
 
-    useEffect(() => {
-        if (organization?.id && dateRange) {
-            loadReports();
-        }
-    }, [organization, dateRange, customRange]);
+    const toLocalDateStr = (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    };
 
-    const loadReports = () => {
-        if (!organization?.id) return;
-
-        const params = {
-            organizationId: organization.id,
-        };
+    const buildDateParams = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
 
         if (dateRange === 'custom' && customRange[0] && customRange[1]) {
-            params.startDate = customRange[0].toISOString().split('T')[0];
-            params.endDate = customRange[1].toISOString().split('T')[0];
-        } else if (dateRange !== 'custom') {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-
-            switch (dateRange) {
-                case 'current-month':
-                    params.startDate = new Date(year, month, 1).toISOString().split('T')[0];
-                    params.endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
-                    break;
-                case 'last-month':
-                    params.startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
-                    params.endDate = new Date(year, month, 0).toISOString().split('T')[0];
-                    break;
-            }
+            return {
+                startDate: toLocalDateStr(customRange[0]),
+                endDate: toLocalDateStr(customRange[1]),
+            };
         }
+
+        switch (dateRange) {
+            case 'current-month':
+                return {
+                    startDate: toLocalDateStr(new Date(year, month, 1)),
+                    endDate: toLocalDateStr(new Date(year, month + 1, 0)),
+                };
+            case 'last-month':
+                return {
+                    startDate: toLocalDateStr(new Date(year, month - 1, 1)),
+                    endDate: toLocalDateStr(new Date(year, month, 0)),
+                };
+            default:
+                // Формат yyyy-MM (месяц из списка доступных отчётов)
+                if (/^\d{4}-\d{2}$/.test(dateRange)) {
+                    const [y, m] = dateRange.split('-').map(Number);
+                    return {
+                        startDate: toLocalDateStr(new Date(y, m - 1, 1)),
+                        endDate: toLocalDateStr(new Date(y, m, 0)),
+                    };
+                }
+                return {};
+        }
+    };
+
+    useEffect(() => {
+        if (!organization?.id) return;
+        if (dateRange === 'custom' && (!customRange[0] || !customRange[1])) return;
+
+        const params = { organizationId: organization.id, ...buildDateParams() };
 
         if (activeTab === 'dashboard') {
             dispatch(getOrganizationDashboard(params));
         } else if (activeTab === 'summary') {
             dispatch(getOrganizationSummaryReport(params));
+        } else if (activeTab === 'detailed') {
+            dispatch(getDetailedReport({ ...params, page: 1, limit: 50 }));
+            dispatch(getDetailedReportFilterOptions(organization.id));
         }
-    };
+    }, [organization, dateRange, customRange, activeTab]);
 
     const handleFileUpload = async () => {
         if (!selectedFile || !organization?.id) {
@@ -130,7 +151,9 @@ const FinanceReportPage = () => {
             setSelectedFile(null);
 
             // Перезагружаем данные
-            loadReports();
+            const params = { organizationId: organization.id, ...buildDateParams() };
+            if (activeTab === 'dashboard') dispatch(getOrganizationDashboard(params));
+            else if (activeTab === 'summary') dispatch(getOrganizationSummaryReport(params));
             dispatch(getAvailableDates(organization.id));
         } catch (error) {
             notifications.show({
@@ -207,9 +230,11 @@ const FinanceReportPage = () => {
                     </Group>
                 </Group>
 
-                {availableDates && (
+                {availableDates?.minDate && (
                     <Text size="sm" c="dimmed" mt="sm">
-                        Доступные отчеты: с {availableDates.minDate} по {availableDates.maxDate}
+                        Доступные отчеты: с{' '}
+                        {new Date(availableDates.minDate).toLocaleDateString('ru-RU')} по{' '}
+                        {new Date(availableDates.maxDate).toLocaleDateString('ru-RU')}
                     </Text>
                 )}
             </Paper>
@@ -256,7 +281,12 @@ const FinanceReportPage = () => {
                 </Tabs.Panel>
 
                 <Tabs.Panel value="detailed" pt="xl">
-                    <DetailedReport />
+                    <DetailedReport
+                        key={organization?.id || 0}
+                        organizationId={organization?.id}
+                        pageStartDate={buildDateParams().startDate}
+                        pageEndDate={buildDateParams().endDate}
+                    />
                 </Tabs.Panel>
             </Tabs>
 

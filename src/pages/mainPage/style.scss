@@ -1,12 +1,17 @@
 .mainPageContainerItem {
   width: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  background: #e5e5e5;
+  background: #f8f9fa;
+
+  .skus {
+    flex-shrink: 0;
+  }
 
   .container {
-    padding: 10px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -14,24 +19,25 @@
 
     .title {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 12px;
       position: sticky;
       top: 0;
       z-index: 10;
       background-color: #fff;
-      padding: 15px 20px;
+      padding: 14px 20px;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e0e0e0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      border: 1px solid #f0f0f0;
 
       h3 {
-        font-size: 22px;
-        font-weight: 600;
+        font-size: 20px;
+        font-weight: 700;
         margin: 0;
+        color: #1a1a2e;
       }
 
       .video {
@@ -39,18 +45,20 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        border-radius: 7px;
-        border: 1px solid #ccc;
-        padding: 0 20px;
-        height: 50px;
+        gap: 6px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 0 16px;
+        height: 40px;
         cursor: pointer;
         transition: all 0.2s ease;
         white-space: nowrap;
+        font-size: 14px;
+        color: #374151;
 
         &:hover {
-          background: #f7f7f7;
-          border-color: #999;
+          background: #f9fafb;
+          border-color: #d1d5db;
         }
       }
 
@@ -59,26 +67,26 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-     //   z-index: 3000;
       }
 
       .timeSelector {
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #ccc;
-        border-radius: 7px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
         width: 200px;
-        height: 50px;
+        height: 40px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 500;
+        color: #374151;
         background: #fff;
         transition: all 0.2s ease;
 
         &:hover {
-          background: #f7f7f7;
-          border-color: #999;
+          background: #f9fafb;
+          border-color: #d1d5db;
         }
       }
 
@@ -86,43 +94,42 @@
         position: absolute;
         top: calc(100% + 8px);
         right: 0;
-        width: 220px;
-        z-index: 100;
+        width: 230px;
+        z-index: 3000;
         background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 7px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
         padding: 10px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 3000;
+        gap: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 
         .dateTimeItem {
           width: 100%;
-          border: 1px solid #e0e0e0;
           height: 36px;
           padding: 0 12px;
-          border-radius: 6px;
+          border-radius: 7px;
           display: flex;
           align-items: center;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: background 0.15s ease;
+          font-size: 14px;
+          color: #374151;
+
+          &:hover {
+            background: #f3f4f6;
+          }
 
           span {
             font-size: 14px;
           }
-
-          &:hover {
-            background: #f0f0f0;
-            border-color: #ccc;
-          }
         }
 
         .timeSelectorCustom {
-          margin-top: 5px;
-          padding-top: 10px;
-          border-top: 1px solid #e0e0e0;
+          margin-top: 4px;
+          padding-top: 8px;
+          border-top: 1px solid #f3f4f6;
         }
       }
     }
@@ -138,7 +145,6 @@
   }
 }
 
-// Адаптив для планшетов
 @media (max-width: 1024px) {
   .mainPageContainerItem .container .title {
     flex-wrap: wrap;
@@ -146,38 +152,35 @@
 
     h3 {
       width: 100%;
-      margin-bottom: 10px;
     }
 
     .timeSelectorWrapper,
     .video {
       flex: 1;
-      min-width: 180px;
+      min-width: 160px;
     }
   }
 }
 
-// Адаптив для мобильных
 @media (max-width: 768px) {
   .mainPageContainerItem {
     flex-direction: column;
 
-    .container .title {
+    .container {
       padding: 10px;
 
-      h3 {
-        font-size: 18px;
-      }
+      .title {
+        padding: 10px 14px;
 
-      .timeSelectorWrapper,
-      .video {
-        width: 100%;
-      }
+        h3 { font-size: 17px; }
 
-      .timeSelectItem {
-        right: auto;
-        left: 0;
-        width: 100%;
+        .timeSelector { width: 100%; }
+
+        .timeSelectItem {
+          right: auto;
+          left: 0;
+          width: 100%;
+        }
       }
     }
   }

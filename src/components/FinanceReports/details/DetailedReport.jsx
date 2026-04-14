@@ -24,61 +24,104 @@ import {
 import 'dayjs/locale/ru';
 import './style.scss';
 
-const DetailedReport = () => {
+// Преобразует Date → 'YYYY-MM-DD' без сдвига по UTC
+const toLocalDateStr = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+};
+
+// Преобразует 'YYYY-MM-DD' → Date в локальном времени
+const fromDateStr = (str) => {
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
+};
+
+const DetailedReport = ({ organizationId, pageStartDate, pageEndDate }) => {
     const dispatch = useDispatch();
-    const { organization } = useSelector((state) => state.organization);
     const { detailedReportData, detailedReportLoading, filterOptions } = useSelector(
         (state) => state.reports
     );
 
-    // Состояния фильтров
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSize, setSelectedSize] = useState(null);
     const [selectedOperation, setSelectedOperation] = useState(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
-    const [dateRange, setDateRange] = useState([null, null]);
     const [activePage, setActivePage] = useState(1);
     const itemsPerPage = 50;
 
-    // Загружаем опции фильтров при монтировании
-    useEffect(() => {
-        if (organization?.id) {
-            dispatch(getDetailedReportFilterOptions(organization.id));
-        }
-    }, [organization, dispatch]);
+    // Даты хранятся как строки — React сравнивает их по значению (не по ссылке)
+    const [startDate, setStartDate] = useState(pageStartDate || null);
+    const [endDate, setEndDate] = useState(pageEndDate || null);
 
-    // Загружаем данные при изменении фильтров
+    // Загружаем опции фильтров при монтировании (organizationId — примитив, надёжное сравнение)
     useEffect(() => {
-        if (organization?.id) {
-            loadData();
+        if (organizationId) {
+            dispatch(getDetailedReportFilterOptions(organizationId));
         }
-    }, [
-        organization,
-        searchQuery,
-        selectedSize,
-        selectedOperation,
-        selectedWarehouse,
-        dateRange,
-        activePage,
-    ]);
+    }, [organizationId, dispatch]);
 
-    const loadData = () => {
-        if (!organization?.id) return;
+    // Синхронизируем даты с верхним селектором страницы
+    useEffect(() => {
+        if (pageStartDate && pageEndDate) {
+            setStartDate(pageStartDate);
+            setEndDate(pageEndDate);
+            setActivePage(1);
+        } else {
+            setStartDate(null);
+            setEndDate(null);
+        }
+    }, [pageStartDate, pageEndDate]);
+
+    // Загружаем данные (organizationId — число, startDate/endDate — строки: все примитивы)
+    useEffect(() => {
+        if (!organizationId) return;
+        if (!startDate || !endDate) return;
 
         const params = {
-            organizationId: organization.id,
+            organizationId,
             page: activePage,
             limit: itemsPerPage,
+            startDate,
+            endDate,
         };
 
         if (searchQuery) params.searchQuery = searchQuery;
         if (selectedSize) params.size = selectedSize;
         if (selectedOperation) params.documentType = selectedOperation;
         if (selectedWarehouse) params.warehouse = selectedWarehouse;
-        if (dateRange[0]) params.startDate = dateRange[0].toISOString().split('T')[0];
-        if (dateRange[1]) params.endDate = dateRange[1].toISOString().split('T')[0];
-
         dispatch(getDetailedReport(params));
+    }, [
+        organizationId,
+        startDate,
+        endDate,
+        searchQuery,
+        selectedSize,
+        selectedOperation,
+        selectedWarehouse,
+        activePage,
+    ]);
+
+    // Значение для DatePickerInput: строки → Date объекты
+    const pickerValue = [
+        startDate ? fromDateStr(startDate) : null,
+        endDate ? fromDateStr(endDate) : null,
+    ];
+
+    const handleDateChange = (val) => {
+        if (val && val[0] && val[1]) {
+            setStartDate(toLocalDateStr(val[0]));
+            setEndDate(toLocalDateStr(val[1]));
+        } else if (pageStartDate && pageEndDate) {
+            // При очистке — возврат к датам страницы
+            setStartDate(pageStartDate);
+            setEndDate(pageEndDate);
+        } else {
+            setStartDate(null);
+            setEndDate(null);
+        }
+        setActivePage(1);
     };
 
     const formatNumber = (value) => {
@@ -210,8 +253,8 @@ const DetailedReport = () => {
                         <DatePickerInput
                             type="range"
                             placeholder="Период"
-                            value={dateRange}
-                            onChange={setDateRange}
+                            value={pickerValue}
+                            onChange={handleDateChange}
                             locale="ru"
                             style={{ width: 250 }}
                             clearable

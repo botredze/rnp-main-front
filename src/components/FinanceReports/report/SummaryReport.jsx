@@ -84,16 +84,6 @@ const SummaryReport = ({ tableData }) => {
                                     </Table.Td>
                                 ))}
                             </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Количество возврата
-                                </Table.Td>
-                                {tableData.salesData.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right" c="red">
-                                        {data.returnQty || 0}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
                         </Table.Tbody>
                     </Table>
                 </ScrollArea>
@@ -363,104 +353,6 @@ const SummaryReport = ({ tableData }) => {
                 </ScrollArea>
             </Paper>
 
-            {/* Таблица корректировок - БЕЗ ДАТ */}
-            <Paper withBorder p="md" radius="md">
-                <Text size="lg" fw={600} mb="md">
-                    Корректировки
-                </Text>
-                <ScrollArea>
-                    <Table
-                        striped
-                        highlightOnHover
-                        withTableBorder
-                        withColumnBorders
-                        className="summary-table"
-                    >
-                        <Table.Thead>
-                            <Table.Tr>
-                                <Table.Th className="first-column">Показатель</Table.Th>
-                                {tableData.months.map((month, idx) => (
-                                    <Table.Th key={idx} className="month-column">
-                                        {month.label}
-                                    </Table.Th>
-                                ))}
-                            </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Корректировка эквайринга
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.acquiring || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Компенсация подмененного товара
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.replacedGoods || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Компенсация потерянного товара
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.lostGoods || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Компенсация брака
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.defect || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Коррекция продаж
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.salesCorrection || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Коррекция логистика
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.logisticsCorrection || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                            <Table.Tr>
-                                <Table.Td className="first-column" fw={600}>
-                                    Авансовая оплата за товар без движения
-                                </Table.Td>
-                                {tableData.corrections.map((data, idx) => (
-                                    <Table.Td key={idx} className="month-column" ta="right">
-                                        {data.advancePayment || '-'}
-                                    </Table.Td>
-                                ))}
-                            </Table.Tr>
-                        </Table.Tbody>
-                    </Table>
-                </ScrollArea>
-            </Paper>
         </Stack>
     );
 };

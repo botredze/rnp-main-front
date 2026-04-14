@@ -1,29 +1,55 @@
-// RnpMetrics styles
 .rnp-metrics {
   padding: 24px;
-  background: #e5e5e5;
+  background: #f8f9fa;
   min-height: 100vh;
-  margin: 0;
 
   &__header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 
     h1 {
-      color: #1a1a1a;
-      font-size: 32px;
-      font-weight: 600;
-      margin: 0 0 12px 0;
+      color: #1a1a2e;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
     }
   }
 
   &__date-range {
-    color: #888;
-    font-size: 14px;
+    color: #9ca3af;
+    font-size: 13px;
+    background: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid #e9ecef;
   }
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rnp-metrics {
+    padding: 16px;
+
+    &__header h1 { font-size: 20px; }
+
+    &__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .rnp-metrics__grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -8,6 +8,7 @@ const initialState = {
     },
     selectedOrganization: {},
     loading: false,
+    syncingOrgId: null,
     error: null,
     organizationList: [{ id: 0, organizationName: '' }],
     organizationListById: [],
@@ -74,10 +75,7 @@ export const createOrganization = createAsyncThunk(
     async (organization, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.post(`/organization/create`, organization);
-
-            if (response.status === 200) {
-                return response.data;
-            }
+            return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
@@ -98,6 +96,21 @@ export const diactiveOrganization = createAsyncThunk(
 
             if (response.status === 200) {
                 return response.data;
+            }
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const triggerOrganizationSync = createAsyncThunk(
+    'organization/triggerSync',
+    async (organizationId, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post(`/organization/sync`, { organizationId });
+
+            if (response.status === 200 || response.status === 201) {
+                return { organizationId, ...response.data };
             }
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
@@ -185,6 +198,19 @@ const organizationSlice = createSlice({
             })
             .addCase(diactiveOrganization.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload;
+            })
+
+            //triggerOrganizationSync
+            .addCase(triggerOrganizationSync.pending, (state, action) => {
+                state.syncingOrgId = action.meta.arg;
+                state.error = null;
+            })
+            .addCase(triggerOrganizationSync.fulfilled, (state) => {
+                state.syncingOrgId = null;
+            })
+            .addCase(triggerOrganizationSync.rejected, (state, action) => {
+                state.syncingOrgId = null;
                 state.error = action.payload;
             })
 

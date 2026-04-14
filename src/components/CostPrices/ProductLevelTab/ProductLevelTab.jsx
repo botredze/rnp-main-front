@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Table,
@@ -31,9 +31,11 @@ const ProductLevelTab = () => {
     const [modalOpened, setModalOpened] = useState(false);
     const [activePage, setActivePage] = useState(1);
     const itemsPerPage = 20;
+    const fetchedIds = useRef(new Set());
 
     useEffect(() => {
         if (organization?.id) {
+            fetchedIds.current = new Set();
             dispatch(getOrganizationProductLis({ organizationId: organization.id }));
         }
     }, [organization, dispatch]);
@@ -53,14 +55,13 @@ const ProductLevelTab = () => {
     );
 
     useEffect(() => {
-        if (paginatedProducts.length > 0) {
-            paginatedProducts.forEach((product) => {
-                if (productCostPricesMap[product.id] === undefined) {
-                    dispatch(getProductCostPrice({ productId: product.id, includeHistory: false }));
-                }
-            });
-        }
-    }, [paginatedProducts, productCostPricesMap, dispatch]);
+        paginatedProducts.forEach((product) => {
+            if (!fetchedIds.current.has(product.id)) {
+                fetchedIds.current.add(product.id);
+                dispatch(getProductCostPrice({ productId: product.id, includeHistory: false }));
+            }
+        });
+    }, [paginatedProducts]);
 
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
@@ -81,7 +82,6 @@ const ProductLevelTab = () => {
     };
 
     const formatNumber = (value) => {
-        console.log(value, 'value');
         if (!value || isNaN(value)) return '0';
         return Math.round(value)
             .toString()

@@ -42,16 +42,15 @@ const SideBar = () => {
             const firstOrg = organizationList[0];
             setSelectedIP(String(firstOrg.id));
             dispatch(setSelectedOrganization(firstOrg));
-            console.log(organization, 'organization');
         }
     }, [organizationList, organization.id, dispatch]);
 
     useEffect(() => {
         if (organization.id) {
             setSelectedIP(String(organization.id));
-            dispatch(getOrganizationBasicAnalytics({ organizationId: organization?.id ?? 0 }));
+            dispatch(getOrganizationBasicAnalytics({ organizationId: organization.id }));
         }
-    }, [organization.id]);
+    }, [organization.id, dispatch]);
 
     const handleSelectChange = (value) => {
         setSelectedIP(value);
@@ -76,11 +75,11 @@ const SideBar = () => {
         { to: '/unitEconomic', label: 'Юнит экономика', icon: <IconCoin size={20} /> },
         { to: '/reports', label: 'Отчеты', icon: <IconFileAnalytics size={20} /> },
         { to: '/costPrice', label: 'Себестоимость', icon: <ShoppingBagOutlinedIcon size={20} /> },
-        // {
-        //     to: '/other-expenses',
-        //     label: 'Прочие расходы',
-        //     icon: <CurrencyExchangeOutlinedIcon size={20} />,
-        // },
+        {
+            to: '/other-expenses',
+            label: 'Прочие расходы',
+            icon: <CurrencyExchangeOutlinedIcon size={20} />,
+        },
         // { to: '/pnlReport', label: 'ОПиУ', icon: <ScoreOutlinedIcon size={20} /> },
         { to: '/settings', label: 'Настройки', icon: <IconSettings size={20} /> },
     ];

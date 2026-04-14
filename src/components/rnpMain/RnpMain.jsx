@@ -25,24 +25,27 @@ const RnpMain = () => {
         {
             title: 'Статистика заказов',
             rows: [
-                { label: 'Заказы', key: 'orders_count', changeKey: 'orders_count_change_percent' },
+                { label: 'Заказы', key: 'orders_count', changeKey: 'orders_count_change_percent', unit: null },
                 {
                     label: 'Продажи',
                     key: 'sales_total_amount',
                     changeKey: 'sales_total_amount_change_percent',
+                    unit: 'rub',
                 },
                 {
                     label: 'Количество продаж',
                     key: 'sales_total_count',
                     changeKey: 'sales_total_count_change_percent',
+                    unit: null,
                 },
                 {
                     label: 'Общий процент выкупа',
                     key: 'avg_buy_out_percent',
                     changeKey: 'avg_buy_out_percent_change_percent',
+                    unit: 'percent',
                 },
-                { label: 'Оборачиваемость дней', key: 'days_to_finish', changeKey: null },
-                { label: 'Остаток кончится', key: 'finish_date', changeKey: null },
+                { label: 'Оборачиваемость дней', key: 'days_to_finish', changeKey: null, unit: 'days' },
+                { label: 'Остаток кончится', key: 'finish_date', changeKey: null, unit: 'date' },
             ],
         },
         {
@@ -51,6 +54,7 @@ const RnpMain = () => {
                 {
                     label: 'Остаток на складах',
                     key: 'stock_total',
+                    unit: null,
                     // changeKey: 'stock_count_change_percent',
                 },
             ],
@@ -62,58 +66,67 @@ const RnpMain = () => {
                     label: 'Процент выкупа',
                     key: 'avg_buy_out_percent',
                     changeKey: 'avg_buy_out_percent_change_percent',
+                    unit: 'percent',
                 },
                 {
                     label: 'Переходы',
                     key: 'open_card_count',
                     changeKey: 'open_card_count_change_percent',
+                    unit: null,
                 },
                 {
                     label: 'Добавили в корзину',
                     key: 'add_to_card_count',
                     changeKey: 'add_to_card_count_change_percent',
+                    unit: null,
                 },
                 {
                     label: 'Процент добавления в корзину',
                     key: 'avg_add_to_card_conversion',
                     changeKey: 'avg_add_to_card_conversion_change_percent',
+                    unit: 'percent',
                 },
                 {
                     label: 'Добавили в заказ',
                     key: 'history_orders_count',
                     changeKey: 'history_orders_count_change_percent',
+                    unit: null,
                 },
                 {
                     label: 'Процент добавления в заказ',
                     key: 'avg_card_to_order_conversion',
                     changeKey: 'avg_card_to_order_conversion_change_percent',
+                    unit: 'percent',
                 },
                 {
                     label: 'Органические клики',
                     key: 'organic_clicks',
                     changeKey: 'organic_clicks_change_percent',
+                    unit: null,
                 },
             ],
         },
         {
             title: 'Реклама',
             rows: [
-                { label: 'Затраты', key: 'adv_spend', changeKey: 'adv_spend_change_percent' },
-                { label: 'Просмотров', key: 'adv_views', changeKey: 'adv_views_change_percent' },
-                { label: 'Кликов', key: 'adv_clicks', changeKey: 'adv_clicks_change_percent' },
-                { label: 'CPC', key: 'cpc', changeKey: 'cpc_change_percent' },
-                { label: 'CTR', key: 'ctr', changeKey: 'ctr_change_percent' },
+                { label: 'Затраты', key: 'adv_spend', changeKey: 'adv_spend_change_percent', unit: 'rub' },
+                { label: 'Просмотров', key: 'adv_views', changeKey: 'adv_views_change_percent', unit: null },
+                { label: 'Кликов', key: 'adv_clicks', changeKey: 'adv_clicks_change_percent', unit: null },
+                { label: 'CPC', key: 'cpc', changeKey: 'cpc_change_percent', unit: 'rub' },
+                { label: 'CTR', key: 'ctr', changeKey: 'ctr_change_percent', unit: 'percent' },
                 {
                     label: 'Добавили в корзину с рекламы',
                     key: 'adv_atbs',
                     changeKey: 'adv_atbs_change_percent',
+                    unit: null,
                 },
                 {
                     label: 'Заказов с рекламы',
                     key: 'adv_orders',
                     changeKey: 'adv_orders_change_percent',
+                    unit: null,
                 },
-                { label: 'CPO', key: 'cpo', changeKey: 'cpo_change_percent' },
+                { label: 'CPO', key: 'cpo', changeKey: 'cpo_change_percent', unit: 'rub' },
             ],
         },
     ];
@@ -131,32 +144,46 @@ const RnpMain = () => {
         }
     }, [rnpStatistic]);
 
-    const formatValue = (value, key) => {
-        if (value === null || value === undefined) return '0';
+    const formatValue = (value, unit) => {
+        if (value === null || value === undefined) return '—';
 
-        if (key === 'finish_date') {
+        if (unit === 'date') {
             return DateTime.fromISO(value).toFormat('dd.MM.yyyy');
         }
 
-        return value;
+        const num = Number(value);
+
+        if (unit === 'rub') {
+            return num.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + ' ₽';
+        }
+
+        if (unit === 'percent') {
+            return Number(num.toFixed(1)) + '%';
+        }
+
+        if (unit === 'days') {
+            return num + ' дн.';
+        }
+
+        return Number.isInteger(num) ? num.toLocaleString('ru-RU') : num.toLocaleString('ru-RU', { maximumFractionDigits: 2 });
     };
 
     const renderCellWithTrend = (data, row) => {
-        const value = formatValue(data[row.key], row.key);
+        const value = formatValue(data[row.key], row.unit);
         const changePercent = row.changeKey ? data[row.changeKey] : null;
 
         return (
             <Box
                 sx={{
                     position: 'relative',
-                    padding: '8px',
-                    width: 110,
-                    height: 60,
+                    padding: '4px 8px',
+                    width: 120,
+                    height: 44,
                     alignItems: 'center',
                     justifyContent: 'center',
                     display: 'flex',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
+                    backgroundColor: '#f9fafb',
                 }}
             >
                 <div className="contentValue">{value}</div>
@@ -174,18 +201,18 @@ const RnpMain = () => {
                             <Box
                                 sx={{
                                     position: 'absolute',
-                                    top: 4,
-                                    right: 4,
+                                    top: 3,
+                                    right: 5,
                                     display: 'flex',
                                     alignItems: 'center',
-                                    fontSize: 12,
-                                    color: isPositive ? '#4caf50' : '#f44336',
+                                    gap: '1px',
+                                    color: isPositive ? '#16a34a' : '#dc2626',
                                 }}
                             >
                                 {isPositive ? (
-                                    <TrendingUpIcon sx={{ fontSize: 12 }} />
+                                    <TrendingUpIcon sx={{ fontSize: 11 }} />
                                 ) : (
-                                    <TrendingDownIcon sx={{ fontSize: 12 }} />
+                                    <TrendingDownIcon sx={{ fontSize: 11 }} />
                                 )}
 
                                 <span className="percentValue">
@@ -212,6 +239,24 @@ const RnpMain = () => {
                 }}
             >
                 <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (!loading && statistic.length === 0 && !totalData) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: 200,
+                    color: '#9ca3af',
+                    fontSize: 15,
+                }}
+            >
+                Нет данных за выбранный период
             </Box>
         );
     }
@@ -305,7 +350,7 @@ const RnpMain = () => {
                                                         padding: 0,
                                                     }}
                                                 >
-                                                    {formatValue(totalData[row.key], row.key)}
+                                                    {formatValue(totalData[row.key], row.unit)}
                                                 </Box>
                                             </TableCell>
                                         )}

@@ -37,7 +37,9 @@ const PublicRoute = ({ children }) => {
 const OrganizationGuard = ({ children }) => {
     const { organizationList } = useSelector((state) => state.organization);
 
-    const hasActiveOrganization = organizationList?.some((org) => org.status === 'active');
+    const hasActiveOrganization = organizationList?.some(
+        (org) => org.status === 'active' || org.status === 'inited'
+    );
 
     if (!hasActiveOrganization) {
         return <Navigate to="/hello" replace />;
@@ -51,7 +53,9 @@ const NoOrganizationOnly = ({ children }) => {
 
     if (isLoading) return null;
 
-    const hasActiveOrganization = organizationList.some((org) => org.status === 'active');
+    const hasActiveOrganization = organizationList.some(
+        (org) => org.status === 'active' || org.status === 'inited'
+    );
 
     if (hasActiveOrganization) {
         return <Navigate to="/" replace />;

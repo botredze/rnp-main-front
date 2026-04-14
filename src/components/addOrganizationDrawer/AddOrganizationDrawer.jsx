@@ -23,6 +23,7 @@ const AddOrganizationDrawer = () => {
     const [organizationName, setOrganizationName] = useState('');
     const [apiKey, setApiKey] = useState('');
     const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState(null);
 
     useEffect(() => {
         if (selectedOrganization) {
@@ -38,6 +39,7 @@ const AddOrganizationDrawer = () => {
         setOrganizationName('');
         setApiKey('');
         setErrors({});
+        setServerError(null);
         dispatch(setOpenCreateOrganizationState(false));
         dispatch(setEditOrganizationOpenState(false));
     };
@@ -81,8 +83,11 @@ const AddOrganizationDrawer = () => {
             }
 
             if (resultAction.meta.requestStatus === 'fulfilled') {
-                await dispatch(getOrganizationList());
+                dispatch(getOrganizationList());
                 close();
+            } else if (resultAction.meta.requestStatus === 'rejected') {
+                const payload = resultAction.payload;
+                setServerError(payload?.message || 'Произошла ошибка. Попробуйте ещё раз');
             }
         } catch (err) {
             console.error('Ошибка запроса:', err);
@@ -108,6 +113,12 @@ const AddOrganizationDrawer = () => {
                 >
                     Не знаете где взять API-ключ? Нажмите кнопку "Как получить API-ключ?" на главной
                     странице
+                </Alert>
+            )}
+
+            {serverError && (
+                <Alert icon={<IconInfoCircle size={16} />} color="red" variant="light" mb="md">
+                    {serverError}
                 </Alert>
             )}
 

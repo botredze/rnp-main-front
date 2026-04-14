@@ -3,6 +3,9 @@
   overflow-x: auto;
   position: relative;
   z-index: 2;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f0f0f0 !important;
 }
 
 .rnpTableContainer {
@@ -14,109 +17,90 @@
     left: 0;
     z-index: 3;
     background-color: #fff;
-    min-width: 250px;
-    max-width: 250px;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    max-width: 220px;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
 
     &.stickyHeader {
       z-index: 5;
       background-color: #fff;
       font-weight: 600;
+      font-size: 13px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
     &.categoryHeader {
       z-index: 4;
-      background-color: #f5f5f5 !important;
-      font-weight: bold;
+      background-color: #f8f9fa !important;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #374151;
     }
   }
 
-  // Строки категорий (заголовки секций)
   .categoryRow {
     td {
-      background-color: #f5f5f5;
-      font-weight: bold;
-      border-bottom: 2px solid #e0e0e0;
+      background-color: #f8f9fa;
+      font-weight: 700;
+      border-bottom: 1px solid #e5e7eb;
+      border-top: 1px solid #e5e7eb;
 
       &:not(.stickyColumn) {
-        // Пустые ячейки в строке категории
-        min-width: 120px;
+        min-width: 130px;
       }
     }
   }
 
-  // Стили для заголовков таблицы
   thead tr th {
     background-color: #fff;
     font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-    padding: 12px 16px;
+    font-size: 12px;
+    color: #6b7280;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 10px 12px;
+    text-align: center;
+    white-space: nowrap;
 
     &:not(.stickyColumn) {
-      min-width: 120px;
+      min-width: 130px;
     }
   }
 
-  // Стили для ячеек
   tbody tr td {
-    padding: 10px 16px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 6px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
 
     &:not(.stickyColumn) {
-      min-width: 120px;
+      min-width: 130px;
     }
   }
 
-  // Hover эффект для строк
   tbody tr {
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s ease;
 
     &:hover {
-      background-color: #f9f9f9;
+      background-color: #f9fafb;
 
       .stickyColumn {
-        background-color: #f9f9f9;
+        background-color: #f9fafb;
       }
     }
   }
 }
 
-.rnpTablePaper {
-  .rnpTableContainer {
-
-    .stickyColumn {
-      position: sticky;
-      left: 0;
-      background-color: white;
-      z-index: 10;
-
-      &.stickyHeader {
-        z-index: 100;
-      }
-
-      &.categoryHeader {
-        z-index: 11;
-      }
-    }
-
-    .categoryRow {
-      .categoryHeader {
-        border-bottom: 2px solid #e0e0e0;
-      }
-    }
-
-    .MuiTableCell-root {
-      position: relative;
-    }
-  }
-}
-
-.contentValue{
-  margin-top: 15px;
-  font-size: 15px;
-}
-
-.percentValue{
+.contentValue {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+  color: #111827;
+  margin-top: 14px;
+}
+
+.percentValue {
+  font-size: 11px;
+  font-weight: 700;
 }
